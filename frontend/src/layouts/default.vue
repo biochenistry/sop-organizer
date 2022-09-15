@@ -30,9 +30,7 @@
       <v-list class="flex-1 d-flex flex-column justify-space-around">
         <v-list-item class="mx-auto">
           <v-btn v-if="!isLoggedIn" @click="isLoggingIn = true">Login</v-btn>
-          <v-btn v-if="isLoggedIn">
-            Upload
-          </v-btn>
+          <Upload />
         </v-list-item>
         <v-list-item class="mx-auto">
 
@@ -69,11 +67,11 @@
 import { defineComponent } from "vue";
 import FooterBar from '@/components/FooterBar.vue';
 import LoginModal from '@/components/LoginModal.vue';
-
+import Upload from '@/components/Upload.vue';
 
 export default defineComponent({
   name: 'DefaultLayout',
-  components: { LoginModal, FooterBar },
+  components: { LoginModal, FooterBar, Upload},
   data() {
     return {
       isSidebarVisible: true,
