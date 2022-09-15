@@ -11,11 +11,12 @@ app.use(
 );
 
 app.post("/upload", (req, res) => {
+  console.log(req);
     if (!req.files) {
       return res.status(400).send("No files were uploaded.");
     }
 
-    const file = req.files.myFile;
+    const file = req.files.file;
     const path = __dirname + "/files/" + file.name;
 
     file.mv(path, (err) => {
