@@ -30,7 +30,16 @@
       <v-list class="flex-1 d-flex flex-column justify-space-around">
         <v-list-item class="mx-auto">
           <v-btn v-if="!isLoggedIn" @click="isLoggingIn = true">Login</v-btn>
-          <Upload />
+        </v-list-item>
+        <v-list-item class="mx-auto">
+          <v-btn @click="showRegModal = true" v-if="isAdmin" align-center>
+            Register User
+          </v-btn>
+        </v-list-item>
+        <v-list-item class="mx-auto">
+          <v-btn v-if="isLoggedIn" align-center>
+            Upload
+          </v-btn>
         </v-list-item>
         <v-list-item class="mx-auto">
 
@@ -49,6 +58,7 @@
       bottom
       left
     >
+
       <v-icon large>
         mdi-chevron-right
       </v-icon>
@@ -59,6 +69,7 @@
       </v-container>
     </v-main>
     <login-modal v-if="isLoggingIn" v-on:clearLoginModal="isLoggingIn = false"></login-modal>
+    <RegisterModal v-if="showRegModal"  v-on:clearRegModal="showRegModal = false" />
     <!-- <footer-bar /> -->
   </v-app>
 </template>
@@ -76,6 +87,8 @@ export default defineComponent({
     return {
       isSidebarVisible: true,
       isLoggedIn: true, // TODO - change this default to false
+      isAdmin: true, //TODO - change this default to false, only change after check with database
+      showRegModal: false,
       isLoggingIn: false,
       fixed: false,
       //  TODO - change this to dynamically load data from backend 
