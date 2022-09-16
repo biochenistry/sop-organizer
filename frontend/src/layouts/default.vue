@@ -37,9 +37,7 @@
           </v-btn>
         </v-list-item>
         <v-list-item class="mx-auto">
-          <v-btn v-if="isLoggedIn" align-center>
-            Upload
-          </v-btn>
+          <Upload/>
         </v-list-item>
         <v-list-item class="mx-auto">
 
