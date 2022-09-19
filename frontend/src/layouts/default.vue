@@ -37,9 +37,7 @@
           </v-btn>
         </v-list-item>
         <v-list-item class="mx-auto">
-          <v-btn v-if="isLoggedIn" align-center>
-            Upload
-          </v-btn>
+          <Upload/>
         </v-list-item>
         <v-list-item class="mx-auto">
 
@@ -78,11 +76,11 @@
 import { defineComponent } from "vue";
 import FooterBar from '@/components/FooterBar.vue';
 import LoginModal from '@/components/LoginModal.vue';
-
+import Upload from '@/components/Upload.vue';
 
 export default defineComponent({
   name: 'DefaultLayout',
-  components: { LoginModal, FooterBar },
+  components: { LoginModal, FooterBar, Upload},
   data() {
     return {
       isSidebarVisible: true,
