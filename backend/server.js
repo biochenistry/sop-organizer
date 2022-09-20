@@ -1,8 +1,6 @@
 const express = require("express");
 const fileUpload = require("express-fileupload");
 const cors = require("cors")
-const fs = require("fs");
-const port = 2468
 
 const app = express();
 
@@ -10,24 +8,14 @@ app.use(
   fileUpload(), cors()
 );
 
-app.post("/upload", (req, res) => {
-    if (!req.files) {
-      return res.status(400).send("No files were uploaded.");
-    }
-    if (!fs.existsSync(__dirname + "/../files/")) {
-      fs.mkdirSync(__dirname + "/../files/");
-    }
-    const file = req.files.file;
-    const path = __dirname + "/../files/" + file.name;
-
-    file.mv(path, (err) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      return res.send({ status: "success", path: path });
-    });
+// simple route
+app.get("/", (req, res) => {
+  res.json({ message: "Hello world." });
 });
 
-app.listen(port, () => {
-  console.log('Listening')
-})
+require("/home/sop/sop-organizer-2/backend/routes/document.routes.js")(app);
+
+const PORT = 8080;
+app.listen(PORT, () => {
+  console.log('Server is running on port ' + PORT + '.');
+});
