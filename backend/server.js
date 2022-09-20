@@ -13,9 +13,9 @@ app.get("/", (req, res) => {
   res.json({ message: "Hello world." });
 });
 
-require("/home/abhuynh/sop-organizer-2/backend/routes/document.routes.js")(app);
+require("/home/sop/sop-organizer-2/backend/routes/document.routes.js")(app);
 
 const PORT = 8080;
 app.listen(PORT, () => {
-  console.log('Server is running on port' + PORT + '.');
+  console.log('Server is running on port ' + PORT + '.');
 });
