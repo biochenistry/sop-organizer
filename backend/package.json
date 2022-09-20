@@ -1,16 +1,18 @@
 {
-  "name": "sop-organizer-backend-api",
+  "name": "backend",
   "version": "1.0.0",
-  "description": "Rest controller api for SOP organization application",
-  "main": "index.js",
+  "description": "",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "me",
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.1",
-    "express-fileupload": "^1.4.0"
+    "express-fileupload": "^1.4.0",
+    "fs": "^0.0.1-security",
+    "mysql": "^2.18.1"
   }
 }
