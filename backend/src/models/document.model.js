@@ -1,41 +1,47 @@
 import sql from './db.js';
 import fs from 'fs';
 
+const STORAGE_DIR = `${process.env.PROJECT_PATH}/sop-files/`;
+
 const Document = function (document) {
-  this.name = document.name;
+  this.original_file_name = document.original_file_name;
   this.location = document.location;
-  this.editor = document.editor;
+  this.editor_id = document.editor_id;
+  this.sop_id = document.sop_id;
   this.version_number = document.version_number;
 };
 
-Document.upload = (newDocument, file, result) => {
-  sql.query('INSERT INTO document SET ?', newDocument, (err, res) => {
+Document.upload = (newDocument, file, resultCallback) => {
+  sql.query('INSERT INTO documents SET ?', newDocument, (err, res) => {
     if (err) {
-      console.log('Error: ', err);
-      result(err, null);
+      console.log(`Error: ${err}`);
+      resultCallback(err, null);
       return;
     }
 
-    //Create directory and move file to directory
-    const path = __dirname + '/../../../sop-files/' + res.insertId + '/';
+    // Create SOP directory (if it doesn't exist) and move file to directory
+    const path = `${STORAGE_DIR}/${newDocument.sop_id}/`;
+    const relativePath = `${newDocument.sop_id}/`;
+
     if (!fs.existsSync(path)) {
       fs.mkdirSync(path);
     }
 
-    console.log(path + file.name);
+    // Determine the new file name based on the version and the document extension
+    const newFileName = `${newDocument.version_number}.${file.name.split(".").slice(-1)[0]}`;
 
-    file.mv(path + file.name, (err) => {
+    file.mv(`${path}/${newFileName}`, (err) => {
       if (err) return res.status(500).send(err);
     });
 
     sql.query(
-      'UPDATE document SET location = ? WHERE id = ?',
-      [path + file.name, res.insertId],
-      // (err, res) => {
+      'UPDATE documents SET location = ? WHERE id = ?',
+      [`${relativePath}${newFileName}`, res.insertId],
       (err) => {
+      // (err, res) => {
         if (err) {
           console.log('Error: ', err);
-          result(err, null);
+          resultCallback(err, null);
           return;
         }
       }
@@ -45,13 +51,30 @@ Document.upload = (newDocument, file, result) => {
       id: res.insertId,
       ...newDocument,
     });
-    // The line below is broken for some reason. Perhaps we don't need it.
-    // result(null, { id: res.insertId, ...newDocument });
+  
+    resultCallback(null, { id: res.insertId, ...newDocument });
+  });
+};
+
+Document.getById = (id, resultCallback) => {
+  sql.query('SELECT * FROM documents WHERE id = ? LIMIT 1', [id], (err, res) => {
+    if (err) {
+      console.log(`Error: ${err.message}`);
+      if (err.sqlMessage) {
+        console.log(`SQL Error: ${err.sqlMessage}`);
+      }
+
+      resultCallback(err, null);
+      return;
+    }
+
+    if (!res.length) return resultCallback(new Error('Document not found'), null);
+    resultCallback(undefined, JSON.parse(JSON.stringify(res[0])));
   });
 };
 
 Document.getAll = (resultCallback) => {
-  sql.query('SELECT * FROM document', (err, res) => {
+  sql.query('SELECT * FROM documents', (err, res) => {
     if (err) {
       console.log(`Error: ${err.message}`);
       if (err.sqlMessage) {
