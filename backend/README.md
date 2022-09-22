@@ -4,10 +4,10 @@
 
 #### Environment variables
 
-Create a `.enl` file within the `backend` folder. The file should define the following environment variables. Replace all `<description>` with the value described. Some fields are already filled out.
+Create a `.env` file within the `backend` folder. The file should define the following environment variables. Replace all `<description>` with the value described. Some fields are already filled out.
 
 ```text
-PROJECT_PATH=<working project directory>
+PROJECT_PATH=<full path to sop-organizer-2 dir>
 DB_HOST="coms-402-sd-41.class.las.iastate.edu"
 DB_NAME="sop_database"
 DB_USER=<DB user name>

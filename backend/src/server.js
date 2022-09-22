@@ -1,14 +1,18 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
+import bodyParser from 'body-parser';
 import fileUpload from 'express-fileupload';
 import cors from 'cors';
 import DocumentRoutes from './routes/document.routes.js';
+import SOPRoutes from './routes/sop.routes.js';
+import UserRoutes from './routes/user.routes.js';
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const app = express();
 
-app.use(fileUpload(), cors());
+app.use(fileUpload(), cors(), bodyParser.json());
+app.use('/files', express.static(`${process.env.PROJECT_PATH}/sop-files`));
 
 // default route - returns the API version
 app.get('/', (req, res) => {
@@ -16,6 +20,8 @@ app.get('/', (req, res) => {
 });
 
 // register other routes
+UserRoutes(app);
+SOPRoutes(app);
 DocumentRoutes(app);
 
 app.listen(PORT, () => {

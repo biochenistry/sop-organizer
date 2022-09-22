@@ -2,6 +2,14 @@
 
 ## Build Setup
 
+
+### Environment variables
+
+Create a `.env` file within the `frontend` folder. The file should define the following environment variables. Replace all `<description>` with the value described. Some fields are already filled out.
+```text
+NUXT_ENV_API_URL="http://coms-402-sd-41.class.las.iastate.edu:8080"
+```
+
 ```bash
 # Ensure node version is correct - If you do not want to install nvm, simply make sure your node version matches that contained in the .nvmrc file
 $ nvm use

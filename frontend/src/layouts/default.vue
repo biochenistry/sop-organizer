@@ -5,6 +5,7 @@
       v-model="isSidebarVisible"
       fixed
       app
+      :width="350"
       class="d-flex flex-column justify-space-between"
     >
       <v-toolbar>
@@ -14,19 +15,35 @@
           single-line
         ></v-text-field>
       </v-toolbar>
-      <v-list>
+      <div v-if="isLoading" class="text-center py-12">
+        <v-progress-circular indeterminate :size="70" :width="7"></v-progress-circular>
+      </div>
+      <v-list v-else-if="sops.length">
         <v-list-item
-          v-for="(section, i) in sections"
+          v-for="(sop, i) in sops"
           :key="i"
-          :to="section.to"
+          to=""
           router
           exact
         >
           <v-list-item-content>
-            <v-list-item-title v-text="section.title" />
+            <v-list-item-title v-text="sop.name" />
+            <v-list>
+              <v-list-item
+                v-for="(doc, j) in sop.documents"
+                :key="`${sop.name}-doc-${j}`"
+                to=""
+                router exact
+                >
+                <v-list-item-title v-text="`(v${doc.version_number}) ${doc.original_file_name}`" class="pl-4" />
+              </v-list-item>
+            </v-list>
           </v-list-item-content>
         </v-list-item>
       </v-list>
+      <div v-else class="text-center">
+        <p class="text-h5 py-16">No SOP's found</p>
+      </div>
       <v-list class="flex-1 d-flex flex-column justify-space-around">
         <v-list-item class="mx-auto">
           <v-btn v-if="!isLoggedIn" @click="isLoggingIn = true">Login</v-btn>
@@ -37,7 +54,7 @@
           </v-btn>
         </v-list-item>
         <v-list-item class="mx-auto">
-          <Upload/>
+          <Upload @refresh="updateDocuments" />
         </v-list-item>
         <v-list-item class="mx-auto">
 
@@ -77,10 +94,22 @@ import { defineComponent } from "vue";
 import FooterBar from '@/components/FooterBar.vue';
 import LoginModal from '@/components/LoginModal.vue';
 import Upload from '@/components/Upload.vue';
+import { SOP, Document } from '@/types';
+// import { getDocuments } from '@/services/documents';
+import { getSOPs } from "~/services/sops";
+
+interface State {
+  isSideBarVisible: boolean,
+  isLoggedIn: boolean,
+  isAdmin: boolean,
+  showRegModal: boolean,
+  title: String,
+  sops: Array<SOP>
+};
 
 export default defineComponent({
   name: 'DefaultLayout',
-  components: { LoginModal, FooterBar, Upload},
+  components: { LoginModal, FooterBar, Upload },
   data() {
     return {
       isSidebarVisible: true,
@@ -88,24 +117,30 @@ export default defineComponent({
       isAdmin: true, //TODO - change this default to false, only change after check with database
       showRegModal: false,
       isLoggingIn: false,
-      fixed: false,
-      //  TODO - change this to dynamically load data from backend 
-      sections: [
-        {
-          title: 'Materials',
-          items: ['Stethoscope', 'Dongle', 'Hammer'],
-        },
-        {
-          title: 'Point of Contacts',
-          items: [],
-        },
-        {
-          title: 'Measurements',
-          items: [],
-        },
-      ],
-      title: 'Vuetify.js',
+      title: 'Vuetify.js', // TODO - make change with selected document
+      sops: [],
+      isLoading: true
     }
   },
+  methods: {
+    updateDocuments() {
+      // TODO - loading stuff
+      this.isLoading = true;
+      getSOPs()
+        .then((sops) => {
+          this.sops = sops;
+        })
+        .catch((err) => {
+          // TODO - actual error handling here
+          console.log('error:', err)
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    }
+  },
+  mounted() {
+    this.updateDocuments();
+  }
 });
 </script>
