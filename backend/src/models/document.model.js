@@ -1,5 +1,6 @@
 import sql from './db.js';
 import fs from 'fs';
+import {exec} from 'child_process';
 
 const STORAGE_DIR = `${process.env.PROJECT_PATH}/sop-files/`;
 
@@ -32,6 +33,17 @@ Document.upload = (newDocument, file, resultCallback) => {
 
     file.mv(`${path}/${newFileName}`, (err) => {
       if (err) return res.status(500).send(err);
+      else {
+        console.log('Executing /home/sop/pandoc-2.19.2/bin/pandoc ' + (path + newFileName) + ' -o ' + path + newFileName.substring(0, newFileName.lastIndexOf('.')) + '.html')
+        exec('/home/sop/pandoc-2.19.2/bin/pandoc ' + (path + newFileName) + ' -o ' + path + newFileName.substring(0, newFileName.lastIndexOf('.')) + '.html', function (error, stdOut, stdErr){
+          console.log('stdout: ' + stdOut);
+          console.log('stderr: ' + stdErr);
+          if (error !== null) {
+            console.log('exec error: ' + error);
+          }
+          return;
+        })
+      }
     });
 
     sql.query(
