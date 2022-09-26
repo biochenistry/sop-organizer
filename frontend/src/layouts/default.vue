@@ -35,7 +35,7 @@
                 to=""
                 router exact
                 >
-                <v-list-item-title v-text="`(v${doc.version_number}) ${doc.original_file_name}`" class="pl-4" />
+                <v-list-item-title @click="viewDocuments(doc)" v-text="`(v${doc.version_number}) ${doc.original_file_name}`" class="pl-4" />
               </v-list-item>
             </v-list>
           </v-list-item-content>
@@ -97,6 +97,7 @@ import Upload from '@/components/Upload.vue';
 import { SOP, Document } from '@/types';
 // import { getDocuments } from '@/services/documents';
 import { getSOPs } from "~/services/sops";
+import { getFile } from "~/services/files";
 
 interface State {
   isSideBarVisible: boolean,
@@ -137,6 +138,12 @@ export default defineComponent({
         .finally(() => {
           this.isLoading = false;
         });
+    },
+    viewDocuments(doc) {
+      getFile(doc.location)
+      .then((fileHtml) => {
+        this.$nuxt.$emit('fileHtml', fileHtml)
+      })
     }
   },
   mounted() {
