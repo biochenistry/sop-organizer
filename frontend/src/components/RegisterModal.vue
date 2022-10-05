@@ -1,10 +1,15 @@
 <template>
-    <v-overlay :value="isVisible">
-        <v-card class="pa-4" v-click-outside="emitCloseModal">
-            <v-text-field :id="email" v-model="email" label="Email"></v-text-field>
-            <v-text-field v-model="password" label="Password" type="password"></v-text-field>
-            <v-text-field v-model="cpassword" label="Confirm Password" type="password"></v-text-field>
-            <v-btn color="primary" @click="checkPasswords()">Register</v-btn>
+    <v-overlay :value="isVisible" :z-index="100">
+        <v-card class="pa-4 d-" v-click-outside="closeModal" light>
+            <v-btn fab small color="grey" @click="closeModal">
+                <v-icon color="white">mdi-close</v-icon>
+            </v-btn>
+            <v-responsive min-width="300px" width="40vw" max-width="600px" class="d-flex flex-column pa-4">
+                <v-text-field :id="email" v-model="email" label="Email"></v-text-field>
+                <v-text-field v-model="password" label="Password" type="password"></v-text-field>
+                <v-text-field v-model="cpassword" label="Confirm Password" type="password"></v-text-field>
+                <v-btn color="primary" @click="checkPasswords()" class="float-right">Register</v-btn>
+            </v-responsive>
         </v-card>
     </v-overlay>
 </template>
@@ -22,7 +27,7 @@ export default defineComponent({
         }
     },
     methods: {
-        emitCloseModal() {
+        closeModal() {
             this.$emit('clearRegModal');
         },
         checkPasswords() {

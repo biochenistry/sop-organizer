@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app :style="{ background: $vuetify.theme.themes.light.background }">
     <v-navigation-drawer
       :mini-variant="false"
       v-model="isSidebarVisible"
@@ -16,7 +16,7 @@
         ></v-text-field>
       </v-toolbar>
       <div v-if="isLoading" class="text-center py-12">
-        <v-progress-circular indeterminate :size="70" :width="7"></v-progress-circular>
+        <v-progress-circular indeterminate color="secondary" :size="70" :width="7"></v-progress-circular>
       </div>
       <v-list v-else-if="sops.length">
         <v-list-item
@@ -35,7 +35,7 @@
                 to=""
                 router exact
                 >
-                <v-list-item-title @click="viewDocuments(doc)" v-text="`(v${doc.version_number}) ${doc.original_file_name}`" class="pl-4" />
+                <v-list-item-title @click="viewDocuments(doc)" v-text="`(v${doc.version_number}) ${doc.original_file_name}`" class="pl-4" style="cursor: pointer;" />
               </v-list-item>
             </v-list>
           </v-list-item-content>
