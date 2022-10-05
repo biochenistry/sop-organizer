@@ -1,13 +1,13 @@
 <template>
-    <v-footer app>
-        <span>&copy; {{ new Date().getFullYear() }}</span>
-    </v-footer>
+  <v-footer app>
+    <span>&copy; {{ new Date().getFullYear() }}</span>
+  </v-footer>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
-    name: 'footer-bar',
+  name: 'FooterBar',
 });
 </script>
