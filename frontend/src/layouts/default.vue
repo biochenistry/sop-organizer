@@ -1,8 +1,8 @@
 <template>
   <v-app :style="{ background: $vuetify.theme.themes.light.background }">
     <v-navigation-drawer
-      :mini-variant="false"
       v-model="isSidebarVisible"
+      :mini-variant="false"
       fixed
       app
       :width="350"
@@ -16,26 +16,30 @@
         ></v-text-field>
       </v-toolbar>
       <div v-if="isLoading" class="text-center py-12">
-        <v-progress-circular indeterminate color="secondary" :size="70" :width="7"></v-progress-circular>
+        <v-progress-circular
+          indeterminate
+          color="secondary"
+          :size="70"
+          :width="7"
+        ></v-progress-circular>
       </div>
       <v-list v-else-if="sops.length">
-        <v-list-item
-          v-for="(sop, i) in sops"
-          :key="i"
-          to=""
-          router
-          exact
-        >
+        <v-list-item v-for="(sop, i) in sops" :key="i" to="" router exact>
           <v-list-item-content>
             <v-list-item-title v-text="sop.name" />
             <v-list>
               <v-list-item
                 v-for="(doc, j) in sop.documents"
                 :key="`${sop.name}-doc-${j}`"
-                to=""
-                router exact
-                >
-                <v-list-item-title @click="viewDocuments(doc)" v-text="`(v${doc.version_number}) ${doc.original_file_name}`" class="pl-4" style="cursor: pointer;" />
+                :to="`/document/${doc.id}`"
+                router
+                exact
+              >
+                <v-list-item-title
+                  class="pl-4"
+                  style="max-width: 100%; text-overflow: ellipsis"
+                  v-text="`(v${doc.version_number}) ${doc.original_file_name}`"
+                />
               </v-list-item>
             </v-list>
           </v-list-item-content>
@@ -49,7 +53,7 @@
           <v-btn v-if="!isLoggedIn" @click="isLoggingIn = true">Login</v-btn>
         </v-list-item>
         <v-list-item class="mx-auto">
-          <v-btn @click="showRegModal = true" v-if="isAdmin" align-center>
+          <v-btn v-if="isAdmin" align-center @click="showRegModal = true">
             Register User
           </v-btn>
         </v-list-item>
@@ -57,71 +61,74 @@
           <Upload @refresh="updateDocuments" />
         </v-list-item>
         <v-list-item class="mx-auto">
-
           <v-btn>
-            <v-icon large @click="isSidebarVisible = false">mdi-chevron-left</v-icon>
+            <v-icon large @click="isSidebarVisible = false"
+              >mdi-chevron-left</v-icon
+            >
           </v-btn>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    
+
     <v-btn
       v-if="!isSidebarVisible"
-      @click="isSidebarVisible = true"
       fab
       fixed
       bottom
       left
+      @click="isSidebarVisible = true"
     >
-
-      <v-icon large>
-        mdi-chevron-right
-      </v-icon>
+      <v-icon large> mdi-chevron-right </v-icon>
     </v-btn>
     <v-main>
       <v-container>
         <Nuxt />
       </v-container>
     </v-main>
-    <login-modal v-if="isLoggingIn" v-on:clearLoginModal="isLoggingIn = false"></login-modal>
-    <RegisterModal v-if="showRegModal"  v-on:clearRegModal="showRegModal = false" />
-    <!-- <footer-bar /> -->
+    <login-modal
+      v-if="isLoggingIn"
+      @clearLoginModal="isLoggingIn = false"
+    ></login-modal>
+    <RegisterModal v-if="showRegModal" @clearRegModal="showRegModal = false" />
   </v-app>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import FooterBar from '@/components/FooterBar.vue';
+import { defineComponent } from 'vue';
 import LoginModal from '@/components/LoginModal.vue';
 import Upload from '@/components/Upload.vue';
-import { SOP, Document } from '@/types';
+import { SOP } from '@/types';
 // import { getDocuments } from '@/services/documents';
-import { getSOPs } from "~/services/sops";
-import { getFile } from "~/services/files";
+import { getSOPs } from '~/services/sops';
 
 interface State {
-  isSideBarVisible: boolean,
-  isLoggedIn: boolean,
-  isAdmin: boolean,
-  showRegModal: boolean,
-  title: String,
-  sops: Array<SOP>
-};
+  isSidebarVisible: boolean;
+  isLoggedIn: boolean;
+  isAdmin: boolean;
+  showRegModal: boolean;
+  isLoggingIn: boolean;
+  title: String;
+  sops: Array<SOP>;
+  isLoading: boolean;
+}
 
 export default defineComponent({
   name: 'DefaultLayout',
-  components: { LoginModal, FooterBar, Upload },
-  data() {
+  components: { LoginModal, Upload },
+  data(): State {
     return {
       isSidebarVisible: true,
       isLoggedIn: true, // TODO - change this default to false
-      isAdmin: true, //TODO - change this default to false, only change after check with database
+      isAdmin: true, // TODO - change this default to false, only change after check with database
       showRegModal: false,
       isLoggingIn: false,
-      title: 'Vuetify.js', // TODO - make change with selected document
+      title: 'Home',
       sops: [],
-      isLoading: true
-    }
+      isLoading: true,
+    };
+  },
+  mounted() {
+    this.updateDocuments();
   },
   methods: {
     updateDocuments() {
@@ -133,21 +140,18 @@ export default defineComponent({
         })
         .catch((err) => {
           // TODO - actual error handling here
-          console.log('error:', err)
+          console.log('error:', err);
         })
         .finally(() => {
           this.isLoading = false;
         });
     },
-    viewDocuments(doc) {
-      getFile(doc.location)
-      .then((fileHtml) => {
-        this.$nuxt.$emit('fileHtml', fileHtml)
-      })
-    }
   },
-  mounted() {
-    this.updateDocuments();
-  }
 });
 </script>
+
+<style>
+.v-list {
+  width: 100%;
+}
+</style>

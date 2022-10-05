@@ -1,5 +1,3 @@
-import colors from 'vuetify/es5/util/colors'
-
 export default {
   ssr: false,
   target: 'static',
@@ -48,7 +46,7 @@ export default {
           primary: '#C5281A',
           secondary: '#EBB969',
           anchor: '#C5281A',
-          background: '#EEEEEE'
+          background: '#EEEEEE',
         },
       },
     },
@@ -57,4 +55,4 @@ export default {
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
   srcDir: 'src',
-}
+};
