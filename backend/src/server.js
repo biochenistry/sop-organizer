@@ -7,6 +7,7 @@ import cors from 'cors';
 import DocumentRoutes from './routes/document.routes.js';
 import SOPRoutes from './routes/sop.routes.js';
 import UserRoutes from './routes/user.routes.js';
+import DirectoryRoutes from './routes/directory.routes.js';
 import AuthRoutes from './routes/auth.routes.js';
 
 const PORT = process.env.PORT || 8080;
@@ -24,6 +25,7 @@ app.get('/', (req, res) => {
 UserRoutes(app);
 SOPRoutes(app);
 DocumentRoutes(app);
+DirectoryRoutes(app);
 AuthRoutes(app);
 UserRoutes(app);
 

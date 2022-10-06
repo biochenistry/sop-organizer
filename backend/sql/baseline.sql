@@ -13,12 +13,20 @@ create table if not exists sop_database.users (
     PRIMARY KEY (id)
 );
 
+create table if not exists sop_database.directories (
+    id int NOT NULL unique AUTO_INCREMENT,
+    name varchar(255) NOT NULL,
+    PRIMARY KEY (id)
+);
+
 create table if not exists sop_database.sops (
     id int NOT NULL unique AUTO_INCREMENT,
     name varchar(255) NOT NULL unique,
     description varchar(255),
     latest_version_number int default 0,
-    PRIMARY KEY (id)
+    directory_id int,
+    PRIMARY KEY (id),
+    FOREIGN KEY (directory_id) REFERENCES sop_database.directories(id)
 );
 
 create table if not exists sop_database.documents (

@@ -61,6 +61,12 @@
           <Upload @refresh="updateDocuments" />
         </v-list-item>
         <v-list-item class="mx-auto">
+          <v-btn @click="showDirModal = true" v-if="isAdmin" align-center>
+            Create Directory
+          </v-btn>        </v-list-item>
+        </v-list-item>
+        <v-list-item class="mx-auto">
+
           <v-btn>
             <v-icon large @click="isSidebarVisible = false"
               >mdi-chevron-left</v-icon
@@ -96,33 +102,35 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import LoginModal from '@/components/LoginModal.vue';
+import RegisterModal from '@/components/RegisterModal.vue';
+import CreateDirModal from "@/components/DirectoryModal.vue";
 import Upload from '@/components/Upload.vue';
 import { SOP } from '@/types';
 // import { getDocuments } from '@/services/documents';
 import { getSOPs } from '~/services/sops';
 
 interface State {
-  isSidebarVisible: boolean;
-  isLoggedIn: boolean;
-  isAdmin: boolean;
-  showRegModal: boolean;
-  isLoggingIn: boolean;
-  title: String;
-  sops: Array<SOP>;
-  isLoading: boolean;
-}
+  isSideBarVisible: boolean,
+  isLoggedIn: boolean,
+  isAdmin: boolean,
+  showRegModal: boolean,
+  showDirModal: boolean,
+  title: String,
+  sops: Array<SOP>
+};
 
 export default defineComponent({
   name: 'DefaultLayout',
-  components: { LoginModal, Upload },
-  data(): State {
+  components: { LoginModal, RegisterModal, CreateDirModal, Upload },
+  data() {
     return {
       isSidebarVisible: true,
       isLoggedIn: true, // TODO - change this default to false
       isAdmin: true, // TODO - change this default to false, only change after check with database
       showRegModal: false,
       isLoggingIn: false,
-      title: 'Home',
+      showDirModal: false,
+      title: 'Vuetify.js', // TODO - make change with selected document
       sops: [],
       isLoading: true,
     };
