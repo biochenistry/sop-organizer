@@ -8,7 +8,7 @@ const Directory = function (directory) {
 };
 
 Directory.create = (newDir, resultCallback) => {
-    sql.query('INSERT INTO directories SET ?', newDir, (err) => {
+    sql.query('INSERT INTO directories SET ?', newDir, (err, res) => {
       if (err) {
         console.log(`Error: ${err.message}`);
         if (err.sqlMessage) {
