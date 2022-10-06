@@ -7,6 +7,7 @@ import cors from 'cors';
 import DocumentRoutes from './routes/document.routes.js';
 import SOPRoutes from './routes/sop.routes.js';
 import UserRoutes from './routes/user.routes.js';
+import AuthRoutes from './routes/auth.routes.js';
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -23,6 +24,8 @@ app.get('/', (req, res) => {
 UserRoutes(app);
 SOPRoutes(app);
 DocumentRoutes(app);
+AuthRoutes(app);
+UserRoutes(app);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);

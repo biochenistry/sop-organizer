@@ -1,6 +1,14 @@
 import sql from './db.js';
 
 const User = function (user) {
+<<<<<<< HEAD
+  this.id = user.id;
+  this.email = user.email;
+  this.password = user.password;
+  this.priv = user.priv;
+};
+export default User;
+=======
   this.name = user.name;
   this.email = user.email;
   this.password = user.password;
@@ -72,3 +80,4 @@ User.getById = (id, resultCallback) => {
 };
 
 export default User;
+>>>>>>> b1cec3319a72de3f10aa30c241b06984ab85fc9a
