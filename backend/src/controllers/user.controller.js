@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-const allAccess = (req, res) => {
-  res.status(200).send('Public Content.');
-};
-
-const userBoard = (req, res) => {
-  res.status(200).send('User Content.');
-};
-
-const adminBoard = (req, res) => {
-  res.status(200).send('Admin Content.');
-};
-
-export default { allAccess, userBoard, adminBoard };
-=======
 import User from '../models/user.model.js';
 
 const create = (req, res) => {
@@ -85,4 +70,3 @@ const getById = (req, res) => {
 };
 
 export default { create, getAll, getById, update };
->>>>>>> b1cec3319a72de3f10aa30c241b06984ab85fc9a
