@@ -6,6 +6,13 @@ export interface Document {
   version_number: Number;
 }
 
+export interface Directories {
+    id?: Number,
+    name: String,
+    description?: String,
+    SOP?: Array<SOP>
+}
+
 export interface SOP {
   id?: Number;
   name: String;
