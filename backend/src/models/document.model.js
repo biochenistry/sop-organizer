@@ -101,4 +101,21 @@ Document.getAll = (resultCallback) => {
   });
 };
 
+
+Document.markForDeletion = (id, userId, resultCallback) => {
+  sql.query('UPDATE documents SET marked_for_deletion_by_user_id = ? WHERE id = ?', [userId, id], (err, res) => {
+    if (err) {
+      console.log(`Error: ${err.message}`);
+      if (err.sqlMessage) {
+        console.log(`SQL Error: ${err.sqlMessage}`);
+      }
+
+      resultCallback(err, null);
+      return;
+    }
+
+    resultCallback(undefined, res);
+  });
+};
+
 export default Document;

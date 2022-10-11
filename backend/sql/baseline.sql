@@ -36,7 +36,9 @@ create table if not exists sop_database.documents (
     original_file_name varchar(255),
     location varchar(255),
     version_number int NOT NULL,
+    marked_for_deletion_by_user_id int,
     PRIMARY KEY (id),
     FOREIGN KEY (sop_id) REFERENCES sop_database.sops(id),
-    FOREIGN KEY (editor_id) REFERENCES sop_database.users(id)
+    FOREIGN KEY (editor_id) REFERENCES sop_database.users(id),
+    FOREIGN KEY (marked_for_deletion_by_user_id) REFERENCES sop_database.users(id)
 );
