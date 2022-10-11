@@ -1,5 +1,7 @@
 import Document from '../models/document.model.js';
 import SOP from '../models/sop.model.js';
+import jwt from 'jsonwebtoken';
+import config from '../config/auth.config.js';
 
 const upload = (req, res) => {
   // Verify file
@@ -72,4 +74,26 @@ const getById = (req, res) => {
   });
 };
 
-export default { getAll, getById, upload };
+const markForDeletion = (req, res) => {
+  // TODO - fix the auth routes/helpers so that the access token logic is done there
+  const accessToken = req.headers.authorization?.split(' ')[1];
+
+  jwt.verify(accessToken, config.secret, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({ message: 'Unauthorized!' });
+    }
+    req.userId = decoded.id;
+  });
+
+  Document.markForDeletion(req.params.id, req.userId, (err, document) => {
+    if (err) {
+      res.status(500).send({
+        message: "An error occurred while marking the document for deletion.",
+      });
+      return;
+    }
+    res.status(200).send('Document successfully marked for deletion.');
+  });
+}
+
+export default { getAll, getById, upload , markForDeletion };
