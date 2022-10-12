@@ -13,7 +13,7 @@
           Marked for deletion by user: {{ document.marked_for_deletion_by_user_id }}
         </v-card-subtitle>
 
-        <editor :file="file" @delete-file="isShowingDeleteOverlay = true" />
+        <editor :file="file" :document="document" @delete-file="isShowingDeleteOverlay = true" />
 
         <v-overlay :value="isShowingDeleteOverlay" :z-index="100">
           <v-card v-click-outside="closeDeleteModal" class="pa-4 d-" light>
@@ -36,7 +36,15 @@
               </V-card-text>
               <v-card-actions class="justify-space-between">
                 <v-btn @click="closeDeleteModal">Cancel</v-btn>
-                <v-btn color="primary" @click="markDocForDeletion">Mark for deletion</v-btn>
+                <v-btn v-if="!isAwaitingDeletionCall" color="primary" @click="markDocForDeletion">Mark for deletion</v-btn>
+                <v-progress-circular
+                  v-if="isAwaitingDeletionCall"
+                  indeterminate
+                  :size="40"
+                  :width="4"
+                  color="primary"
+                  class="mr-4"
+                ></v-progress-circular>
               </v-card-actions>
             </v-responsive>
           </v-card>
@@ -56,6 +64,7 @@ export default {
   data() {
     return {
       isShowingDeleteOverlay: false,
+      isAwaitingDeletionCall: false
     }
   },
   async asyncData({ params, error }) {
@@ -86,9 +95,11 @@ export default {
       this.isShowingDeleteOverlay = false;
     },
     markDocForDeletion() {
+      this.isAwaitingDeletionCall = true;
       markDeleteDocument(this.documentId)
       .then(() => {
         this.$nuxt.refresh(); // refresh the component (and the data)
+        this.closeDeleteModal();
       })
       .catch((err) => {
         this.error({
@@ -97,6 +108,9 @@ export default {
           error: err,
         });
       })
+      .finally(() => {
+        this.isAwaitingDeletionCall = false;
+      });
     }
   },
   head() {

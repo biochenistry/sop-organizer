@@ -2,10 +2,12 @@
   <div>
     <v-container>
       <v-row align-v="center">
-        <v-col cols=1 align="left" align-self="center">📁</v-col>
+        <v-col cols=1 align="left" align-self="center"><v-icon>mdi-folder-open</v-icon></v-col>
         <v-col cols=1 align="left" align-self="center" > {{directoryName}} </v-col>
-        <v-col align="right" align-self="center">
-          <v-btn small @click="selectFile(directoryName)">+</v-btn>
+        <v-col v-if="isLoggedIn" align="right" align-self="center">
+          <v-btn small @click="selectFile(directoryName)">
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
         </v-col>
       </v-row>
       
@@ -47,7 +49,8 @@ import { uploadNew } from '@/services/documents';
 export default defineComponent({
   name: 'UploadButton',
   props: {
-    directoryName: String
+    directoryName: String,
+    isLoggedIn: Boolean
   },
   data: () => ({
     isOverlayVisible: false,

@@ -6,13 +6,11 @@ import jwt from '../middleware/auth.Jwt.js';
 const router = Router();
 
 const AuthRoutes = (app) => {
-  var jsonParser = bodyParser.json();
-
-  router.post('/signin', jsonParser, auth.signin);
+  router.post('/signin', auth.signin);
 
   router.post('/signout', auth.signout);
 
-  router.post('/register', jsonParser, auth.register);
+  router.post('/register', auth.register);
 
   app.use('/auth', router);
 };

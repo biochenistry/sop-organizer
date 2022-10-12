@@ -1,15 +1,18 @@
 <template>
-  <v-overlay :value="isVisible" :z-index="100">
-    <v-card v-click-outside="closeModal" class="pa-4 d-" light>
+  <v-overlay :z-index="100">
+    <v-card v-click-outside="closeModal" class="pa-4" light>
       <v-btn fab small color="grey" @click="closeModal">
         <v-icon color="white">mdi-close</v-icon>
       </v-btn>
+      <v-card-title>Register</v-card-title>
       <v-responsive
+        v-if="!isShowingSuccessMessage"
         min-width="300px"
         width="40vw"
         max-width="600px"
         class="d-flex flex-column pa-4"
       >
+        <v-text-field :id="name" v-model="name" label="Name"></v-text-field>
         <v-text-field :id="email" v-model="email" label="Email"></v-text-field>
         <v-text-field
           v-model="password"
@@ -20,10 +23,28 @@
           v-model="cpassword"
           label="Confirm Password"
           type="password"
+          @keyup.enter.native="submit()"
         ></v-text-field>
-        <v-btn color="primary" class="float-right" @click="checkPasswords()"
+        <v-card-subtitle v-if="errorMessage"><strong>An error occurred.</strong> Error:<br />{{errorMessage}}</v-card-subtitle>
+        <v-btn v-if="!isLoading" color="primary" class="float-right" :disabled="!formIsValid" @click="register"
           >Register</v-btn
         >
+        <v-progress-circular
+          v-if="isLoading"
+          indeterminate
+          :size="40"
+          :width="4"
+          color="primary"
+          class="float-right mr-4"
+        ></v-progress-circular>
+      </v-responsive>
+      <v-responsive v-else>
+        <v-card-subtitle>
+          Account successfully registered.
+        </v-card-subtitle>
+        <v-card-text>
+          Please sign in with your newly created account
+        </v-card-text>
       </v-responsive>
     </v-card>
   </v-overlay>
@@ -31,30 +52,48 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { registerUser } from '~/services/auth';
 
 export default defineComponent({
   name: 'RegisterModal',
   data() {
     return {
+      name: '',
       email: '',
       password: '',
       cpassword: '',
+      errorMessage: undefined,
+      isLoading: false,
+      isShowingSuccessMessage: false,
     };
   },
   methods: {
     closeModal() {
       this.$emit('clearRegModal');
     },
-    checkPasswords() {
-      // TODO - implement this
-      // console.log(this.email);
-      // console.log(this.password);
-      // console.log(this.cpassword);
-      // console.log(this.password === this.cpassword);
+    register() {
+      this.isLoading = true;
+      registerUser({ name: this.name, email: this.email, password: this.password })
+      .then(() => {
+        this.isShowingSuccessMessage = true;
+        setTimeout(() => {
+          this.$emit('clearRegModal');
+        }, 7500);
+      })
+      .catch((err) => {
+        console.log('error', err);
+        this.errorMessage = err.message;
+      })
+      .finally(() => {
+        this.isLoading = false;
+      })
     },
-
-    // sendRegisterData
-    // Will use checkPasswords and won't run unless it returns true
   },
+  computed: {
+    formIsValid() {
+      // TODO - improve this
+      return this.name !== '' && this.email !== '' && this.password !== '' && this.password === this.cpassword;
+    },
+  }
 });
 </script>

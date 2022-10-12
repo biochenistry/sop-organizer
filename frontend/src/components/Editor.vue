@@ -2,7 +2,7 @@
     <v-card v-if="file">
       <v-card-title class="headline justify-space-between" >
         <v-btn color="primary" @click="editFile">{{editingFile ? "Cancel" : "Edit"}}</v-btn>
-        <v-btn v-if="!editingFile" @click="emitDeletion()" fab color="secondary" small>
+        <v-btn v-if="!editingFile" @click="emitDeletion()" :disabled="Boolean(document.marked_for_deletion_by_user_id)" fab color="secondary" small>
           <v-icon>mdi-trash-can</v-icon>
         </v-btn>
         <v-btn color="primary" v-if="editingFile" @click="this.editFile">Save</v-btn>
@@ -26,7 +26,8 @@ import 'quill/dist/quill.snow.css';
 export default defineComponent({
     name: 'Editor',
     props: {
-      file: undefined
+      file: undefined,
+      document: undefined
     },
     data() {
       return {

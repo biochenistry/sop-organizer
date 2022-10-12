@@ -26,7 +26,7 @@
       <v-list v-else-if="directories.length">
         <v-list-item v-for="(directory, i) in directories" :key="i" to="" router exact>
           <v-list-item-content>
-            <Upload :directory-name=directory.name @refresh="updateDocuments" />
+            <Upload :directory-name=directory.name :is-logged-in="isLoggedIn" @refresh="updateDocuments" />
             <v-list>
               <v-list-item
                 v-for="(doc, j) in directory.sops"
@@ -38,8 +38,9 @@
                 <v-list-item-title
                   class="pl-4"
                   style="max-width: 100%; text-overflow: ellipsis"
-                  v-text="`📄 ${doc.name}`"
-                />
+                >
+                <v-icon>mdi-file-document</v-icon> {{doc.name}}
+                </v-list-item-title>
               </v-list-item>
             </v-list>
           </v-list-item-content>
@@ -51,14 +52,18 @@
       <v-list class="flex-1 d-flex flex-column justify-space-around">
         <v-list-item class="mx-auto">
           <v-btn v-if="!isLoggedIn" @click="isLoggingIn = true">Login</v-btn>
+          <div v-else class="text-center">
+            <p>Logged in as {{ username }}</p>
+            <v-btn @click="logout">Logout</v-btn>
+          </div>
         </v-list-item>
-        <v-list-item class="mx-auto">
+        <v-list-item v-if="!isLoggedIn" class="mx-auto">
           <v-btn v-if="isAdmin" align-center @click="showRegModal = true">
             Register User
           </v-btn>
         </v-list-item>
-        <v-list-item class="mx-auto">
-          <v-btn @click="showDirModal = true" v-if="isAdmin" align-center>
+        <v-list-item v-if="isLoggedIn && isAdmin" class="mx-auto">
+          <v-btn @click="showDirModal = true" align-center>
             Create Directory
           </v-btn>        
         </v-list-item>
@@ -91,6 +96,7 @@
     <login-modal
       v-if="isLoggingIn"
       @clearLoginModal="isLoggingIn = false"
+      @authenticationChange="checkAuthentication"
     ></login-modal>
     <RegisterModal v-if="showRegModal" @clearRegModal="showRegModal = false" />
   </v-app>
@@ -112,6 +118,7 @@ interface State {
   isSideBarVisible: boolean,
   isLoggedIn: boolean,
   isAdmin: boolean,
+  username?: String,
   showRegModal: boolean,
   showDirModal: boolean,
   title: String,
@@ -125,12 +132,11 @@ export default defineComponent({
   data() {
     return {
       isSidebarVisible: true,
-      isLoggedIn: true, // TODO - change this default to false
+      isLoggedIn: false,
       isAdmin: true, // TODO - change this default to false, only change after check with database
       showRegModal: false,
       isLoggingIn: false,
       showDirModal: false,
-      title: 'Vuetify.js', // TODO - make change with selected document
       sops: [],
       isLoading: true,
       directories: []
@@ -138,6 +144,7 @@ export default defineComponent({
   },
   mounted() {
     this.updateDocuments();
+    this.checkAuthentication();
   },
   methods: {
     updateDocuments() {
@@ -169,6 +176,17 @@ export default defineComponent({
           });
         });
     },
+    checkAuthentication() {
+      if (window.localStorage.getItem('accessToken')) {
+        this.username = window.localStorage.getItem('username');
+        this.isLoggedIn = true;
+        this.isLoggingIn = false;
+      }
+    },
+    logout() {
+      window.localStorage.clear();
+      this.isLoggedIn = false;
+    }
   },
 });
 </script>

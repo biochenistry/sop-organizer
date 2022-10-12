@@ -19,3 +19,10 @@ export interface SOP {
   description?: String;
   documents?: Array<Document>;
 }
+
+export interface User {
+  id: Number;
+  name: String;
+  privileges: Boolean;
+  password?: String;
+}
