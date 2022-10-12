@@ -23,22 +23,22 @@
           :width="7"
         ></v-progress-circular>
       </div>
-      <v-list v-else-if="sops.length">
-        <v-list-item v-for="(sop, i) in sops" :key="i" to="" router exact>
+      <v-list v-else-if="directories.length">
+        <v-list-item v-for="(directory, i) in directories" :key="i" to="" router exact>
           <v-list-item-content>
-            <v-list-item-title v-text="sop.name" />
+            <Upload :directory-name=directory.name @refresh="updateDocuments" />
             <v-list>
               <v-list-item
-                v-for="(doc, j) in sop.documents"
-                :key="`${sop.name}-doc-${j}`"
+                v-for="(doc, j) in directory.sops"
+                :key="`${directory}-${doc.name}-${j}`"
                 :to="`/document/${doc.id}`"
-                router
+                router  
                 exact
               >
                 <v-list-item-title
                   class="pl-4"
                   style="max-width: 100%; text-overflow: ellipsis"
-                  v-text="`(v${doc.version_number}) ${doc.original_file_name}`"
+                  v-text="`📄 ${doc.name}`"
                 />
               </v-list-item>
             </v-list>
@@ -58,12 +58,9 @@
           </v-btn>
         </v-list-item>
         <v-list-item class="mx-auto">
-          <Upload @refresh="updateDocuments" />
-        </v-list-item>
-        <v-list-item class="mx-auto">
           <v-btn @click="showDirModal = true" v-if="isAdmin" align-center>
             Create Directory
-          </v-btn>        </v-list-item>
+          </v-btn>        
         </v-list-item>
         <v-list-item class="mx-auto">
 
@@ -105,9 +102,11 @@ import LoginModal from '@/components/LoginModal.vue';
 import RegisterModal from '@/components/RegisterModal.vue';
 import CreateDirModal from "@/components/DirectoryModal.vue";
 import Upload from '@/components/Upload.vue';
-import { SOP } from '@/types';
+import { SOP, Directory } from '@/types';
 // import { getDocuments } from '@/services/documents';
-import { getSOPs } from '~/services/sops';
+import { getSOP } from '~/services/sops';
+import { getSops } from '~/services/directories';
+import { getDirectories } from '~/services/directories';
 
 interface State {
   isSideBarVisible: boolean,
@@ -117,6 +116,7 @@ interface State {
   showDirModal: boolean,
   title: String,
   sops: Array<SOP>
+  directories: Array<Directory>
 };
 
 export default defineComponent({
@@ -133,6 +133,7 @@ export default defineComponent({
       title: 'Vuetify.js', // TODO - make change with selected document
       sops: [],
       isLoading: true,
+      directories: []
     };
   },
   mounted() {
@@ -142,16 +143,30 @@ export default defineComponent({
     updateDocuments() {
       // TODO - loading stuff
       this.isLoading = true;
-      getSOPs()
-        .then((sops) => {
-          this.sops = sops;
-        })
-        .catch((err) => {
-          // TODO - actual error handling here
-          console.log('error:', err);
-        })
-        .finally(() => {
-          this.isLoading = false;
+      getDirectories()
+        .then((directories) => {
+          directories.forEach( (directory, index) => {
+            directory['sops'] = [];
+            getSops(directory['id'])
+              .then((sops) => {
+                  sops.forEach( (sop, sopIndex) => {
+                    console.log(sop);
+                    getSOP(sop.sop_id)
+                      .then((sop) => {
+                        directory['sops'].push(sop);
+                        this.directories = directories;
+                        console.log(directories);
+                      })
+                  })
+              })
+              .catch((err) => { 
+                console.log('Directory has no SOPs.'); 
+                this.directories = directories;
+              })
+              .finally(() => {     
+                this.isLoading = false;
+              });
+          });
         });
     },
   },

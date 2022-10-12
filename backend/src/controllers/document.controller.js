@@ -3,7 +3,49 @@ import SOP from '../models/sop.model.js';
 import jwt from 'jsonwebtoken';
 import config from '../config/auth.config.js';
 
-const upload = (req, res) => {
+const uploadNew = (req, res) => {
+  // Verify file
+  if (!req.files || !req.body) {
+    res.status(400).send({
+      message: 'Error. No file or content was found.',
+    });
+  }
+
+  const file = req.files.file;
+  const sopName = file.name;
+  const directoryName = req.body.directory_name;
+  const editorId = req.body.editor_id;
+
+  // Create SOP object
+  const sopObject = new SOP({
+    name: sopName
+  });
+
+  // 1. Create a sub-directory for the SOP in the specified directory name
+  // 2. Put SOP object into database
+  SOP.create(sopObject, directoryName, (err, data) => {
+    if (err) return res.status(500).send({ message: 'An error occurred finding the linked SOP. Please retry upload.' });
+
+    // Create document object
+    const documentObject = new Document({
+      original_file_name: file.name,
+      location: null, // this gets updated below
+      editor_id: editorId,
+      sop_id: data.insertId,
+      version_number: 1,
+    });
+
+    // 1. Put document in specificed sub-directory 
+    // 2. Put document into database
+    Document.uploadNew(documentObject, file, directoryName, (err, data) => {
+      if (err) return res.status(500).send({ message: 'An error occurred finding the linked SOP. Please retry upload.' });  
+
+      res.send(data);
+    });
+  })
+};
+
+const updateExisting = (req, res) => {
   // Verify file
   if (!req.files || !req.body) {
     res.status(400).send({
@@ -15,11 +57,11 @@ const upload = (req, res) => {
   const sopId = req.body.sop_id;
   const editorId = req.body.editor_id;
 
-  // find the latest version number to incremenet it
+  // Find the latest version number to increment it
   SOP.getById(req.body.sop_id, (err, sop) => {
     if (err) return res.status(500).send({ message: 'An error occurred finding the linked SOP. Please retry upload.' });
 
-    // Create document object and put into database
+    // Create document object
     const documentObject = new Document({
       original_file_name: file.name,
       location: null, // this gets updated below
@@ -28,6 +70,7 @@ const upload = (req, res) => {
       version_number: sop.latest_version_number + 1,
     });
   
+    // Upload document and put document into database
     Document.upload(documentObject, file, (err, data) => {
       if (err) {
         res.status(500).send({
@@ -96,4 +139,4 @@ const markForDeletion = (req, res) => {
   });
 }
 
-export default { getAll, getById, upload , markForDeletion };
+export default { getAll, getById, uploadNew, updateExisting , markForDeletion };

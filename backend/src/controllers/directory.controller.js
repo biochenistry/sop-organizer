@@ -7,7 +7,7 @@ const create = (req, res) => {
     }
   
     const newDir = new Directory(req.body);
-  
+      
     Directory.create(newDir, (err) => {
       if (err) {
         if (err.code === 'ER_DUP_ENTRY') {
@@ -48,4 +48,16 @@ const create = (req, res) => {
     });
   };
 
-export default { create , getAll, getById};
+  const getSopsIdsByDirectoryId = (req, res) => {
+    Directory.getSopsIdsByDirectoryId(req.params.id, (err, dir) => {
+      if (err) {
+        res.status(500).send({
+          message: "An error occurred while fetching the directory.",
+        });
+        return;
+      }
+      res.send(dir);
+    });
+  };
+
+export default { create , getAll, getById, getSopsIdsByDirectoryId };

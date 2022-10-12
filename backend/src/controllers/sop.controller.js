@@ -104,4 +104,32 @@ const getById = (req, res) => {
   });
 };
 
+const getByName = (req, res) => {
+  SOP.getByName(req.params.name, (err, sop) => {
+    if (err) {
+      res.status(500).send({
+        message: "An error occurred while fetching an SOP.",
+      });
+      return;
+    }
+
+    // Simply return the SOP if the user didn't ask for the documents to be included
+    if (req.query.include_documents !== "true") {
+      res.send(sop);
+      return;
+    }
+
+    Document.getAll((err, documents) => {
+      if (err) {
+        res.status(500).send({
+          message: 'An error occurred while fetching documents.',
+        });
+      } else {
+        sop.documents = documents.filter(({ name }) => name === sop.name);
+        res.send(sop);
+      }
+    });
+  });
+};
+
 export default { create, getAll, getById, update };

@@ -1,6 +1,7 @@
 import sql from './db.js';
 import fs from 'fs';
 import {exec} from 'child_process';
+import { relative } from 'path';
 
 const STORAGE_DIR = `${process.env.PROJECT_PATH}/sop-files/`;
 
@@ -12,7 +13,7 @@ const Document = function (document) {
   this.version_number = document.version_number;
 };
 
-Document.upload = (newDocument, file, resultCallback) => {
+Document.uploadNew = (newDocument, file, directoryName, resultCallback) => {
   sql.query('INSERT INTO documents SET ?', newDocument, (err, res) => {
     if (err) {
       console.log(`Error: ${err}`);
@@ -20,7 +21,59 @@ Document.upload = (newDocument, file, resultCallback) => {
       return;
     }
 
-    // Create SOP directory (if it doesn't exist) and move file to directory
+    // Move document into the specified directory under the given SOP id
+    const path = `${STORAGE_DIR}/${directoryName}/${newDocument.sop_id}/`;
+    const relativePath = `${directoryName}/${newDocument.sop_id}/`;
+    console.log(path);
+    console.log(relativePath);
+
+    // Determine the new file name based on the version and the document extension
+    const newFileName = `${newDocument.version_number}.${file.name.split(".").slice(-1)[0]}`;
+
+    file.mv(`${path}/${newFileName}`, (err) => {
+      if (err) return res.status(500).send(err);
+
+      console.log('Executing /home/sop/pandoc-2.19.2/bin/pandoc ' + (path + newFileName) + ' -o ' + path + newFileName.substring(0, newFileName.lastIndexOf('.')) + '.html')
+      exec('/home/sop/pandoc-2.19.2/bin/pandoc ' + (path + newFileName) + ' -o ' + path + newFileName.substring(0, newFileName.lastIndexOf('.')) + '.html', function (error, stdOut, stdErr){
+        console.log('stdout: ' + stdOut);
+        console.log('stderr: ' + stdErr);
+        if (error !== null) {
+          console.log('exec error: ' + error);
+        }
+        sql.query(
+          'UPDATE documents SET location = ? WHERE id = ?',
+          [`${relativePath}${newFileName}`, res.insertId],
+          (err) => {
+          // (err, res) => {
+            if (err) {
+              console.log('Error: ', err);
+              resultCallback(err, null);
+              return;
+            }
+          }
+        );
+    
+        console.log('Database received a new document: ', {
+          id: res.insertId,
+          ...newDocument,
+        });        
+        resultCallback(null, { id: res.insertId, ...newDocument });
+      })
+
+    });
+  });
+};
+
+
+Document.updateExisting = (newDocument, file, directoryName, resultCallback) => {
+  sql.query('INSERT INTO documents SET ?', newDocument, (err, res) => {
+    if (err) {
+      console.log(`Error: ${err}`);
+      resultCallback(err, null);
+      return;
+    }
+
+    // Move document into directory
     const path = `${STORAGE_DIR}/${newDocument.sop_id}/`;
     const relativePath = `${newDocument.sop_id}/`;
 

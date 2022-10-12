@@ -6,9 +6,9 @@ const router = Router();
 const DocumentRoutes = (app) => {
   router.get('/', documents.getAll);
   router.get('/:id', documents.getById);
-  router.post('/upload', documents.upload);
   router.patch('/mark-delete/:id', documents.markForDeletion);
-
+  router.post('/uploadNew', documents.uploadNew);
+  router.post('/updateExisting', documents.updateExisting);
 
   app.use('/documents', router);
 };

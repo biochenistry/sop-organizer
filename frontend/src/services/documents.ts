@@ -22,8 +22,21 @@ export async function getDocument(id): Promise<Document> {
   return document;
 }
 
-export async function uploadDocument(data: any): Promise<Array<Document>> {
-  const res = await fetch(`${BASE_URL}/documents/upload`, {
+export async function uploadNew(data: any): Promise<Array<Document>> {
+  const res = await fetch(`${BASE_URL}/documents/uploadNew`, {
+    method: 'POST',
+    body: data,
+  });
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+
+  const documents: Array<Document> = await res.json();
+  return documents;
+}
+
+export async function updateExisting(data: any): Promise<Array<Document>> {
+  const res = await fetch(`${BASE_URL}/documents/updateExisting`, {
     method: 'POST',
     body: data,
   });

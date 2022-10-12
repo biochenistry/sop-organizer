@@ -15,7 +15,7 @@ create table if not exists sop_database.users (
 
 create table if not exists sop_database.directories (
     id int NOT NULL unique AUTO_INCREMENT,
-    name varchar(255) NOT NULL,
+    name varchar(255) NOT NULL unique,
     PRIMARY KEY (id)
 );
 
@@ -24,9 +24,14 @@ create table if not exists sop_database.sops (
     name varchar(255) NOT NULL unique,
     description varchar(255),
     latest_version_number int default 0,
-    directory_id int,
-    PRIMARY KEY (id),
-    FOREIGN KEY (directory_id) REFERENCES sop_database.directories(id)
+    PRIMARY KEY (id)
+);
+
+create table if not exists sop_database.directory_sop (
+    directory_id int NOT NULL,
+    sop_id int NOT NULL,
+    FOREIGN KEY (directory_id) REFERENCES sop_database.directories(id),
+    FOREIGN KEY (sop_id) REFERENCES sop_database.sops(id)
 );
 
 create table if not exists sop_database.documents (

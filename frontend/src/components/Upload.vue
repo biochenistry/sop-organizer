@@ -1,6 +1,15 @@
 <template>
   <div>
-    <v-btn @click="selectFile">Upload File</v-btn>
+    <v-container>
+      <v-row align-v="center">
+        <v-col cols=1 align="left" align-self="center">📁</v-col>
+        <v-col cols=1 align="left" align-self="center" > {{directoryName}} </v-col>
+        <v-col align="right" align-self="center">
+          <v-btn small @click="selectFile(directoryName)">+</v-btn>
+        </v-col>
+      </v-row>
+      
+    </v-container>
     <input
       ref="uploadFile"
       type="file"
@@ -33,10 +42,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { uploadDocument } from '@/services/documents';
+import { uploadNew } from '@/services/documents';
 
 export default defineComponent({
   name: 'UploadButton',
+  props: {
+    directoryName: String
+  },
   data: () => ({
     isOverlayVisible: false,
     fileData: undefined,
@@ -45,10 +57,13 @@ export default defineComponent({
     isSelecting: false,
     isLoading: false,
     editorId: undefined,
+    selectedDirectoryName: undefined
   }),
   methods: {
     // Credit: https://ourcodeworld.com/articles/read/1424/how-to-use-a-button-as-a-file-uploader-with-vuetify-in-vuejs
-    selectFile() {
+    selectFile(selectedDirectoryName) {
+      this.selectedDirectoryName = selectedDirectoryName;
+      console.log(selectedDirectoryName);
       this.isSelecting = true;
       window.addEventListener(
         'focus',
@@ -67,14 +82,12 @@ export default defineComponent({
       this.isOverlayVisible = true;
     },
     uploadFile() {
-      if (!this.sopId || !this.editorId) return;
-
-      this.fileData.append('sop_id', this.sopId);
-      this.fileData.append('editor_id', this.editorId);
+      this.fileData.append('directory_name', this.selectedDirectoryName);
+      this.fileData.append('editor_id', 1); // placeholder for now 
 
       this.isLoading = true;
 
-      uploadDocument(this.fileData)
+      uploadNew(this.fileData)
         .catch((err) => {
           console.log(err);
           // TODO - handle errors properly

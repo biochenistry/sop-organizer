@@ -1,7 +1,8 @@
 <template>
     <v-card v-if="file">
-      <v-card-title class="headline" >
-        <v-btn color="primary" @click="this.editFile">{{editingFile ? "Done" : "Edit"}}</v-btn>
+      <v-card-title class="headline justify-space-between" >
+        <v-btn color="primary" @click="this.editFile">{{editingFile ? "Cancel" : "Edit"}}</v-btn>
+        <v-btn color="primary" v-if="editingFile" @click="this.editFile">Save</v-btn>
       </v-card-title>
       <v-card-text :class="{ hide: (file == null || !editingFile) }">
         <div ref="quillEditor"></div>
@@ -46,25 +47,30 @@ export default defineComponent({
             this.quillViewer.setContents(this.quillEditor.getContents());
           }
         },
+        saveFile() {
+          
+        }
     },
     mounted() {
-      this.quillEditor = new Quill(this.$refs.quillEditor, {
-        modules: {
-          toolbar: this.toolbarOptions
-        },
-        readOnly: false,
-        theme: "snow"
-      })
+      if(this.file) {
+        this.quillEditor = new Quill(this.$refs.quillEditor, {
+          modules: {
+            toolbar: this.toolbarOptions
+          },
+          readOnly: false,
+          theme: "snow"
+        })
 
-      this.quillViewer = new Quill(this.$refs.quillViewer, {
-        modules: {
-          toolbar: false
-        },
-        readOnly: true,
-        theme: "snow"
-      })
-      this.quillEditor.setContents( this.quillEditor.clipboard.convert(this.file), 'silent');
-      this.quillViewer.setContents( this.quillViewer.clipboard.convert(this.file), 'silent');
+        this.quillViewer = new Quill(this.$refs.quillViewer, {
+          modules: {
+            toolbar: false
+          },
+          readOnly: true,
+          theme: "snow"
+        })
+          this.quillEditor.setContents( this.quillEditor.clipboard.convert(this.file), 'silent');
+          this.quillViewer.setContents( this.quillViewer.clipboard.convert(this.file), 'silent');
+      }
     }
 });
 
