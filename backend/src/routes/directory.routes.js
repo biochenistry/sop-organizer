@@ -7,6 +7,7 @@ const DirectoryRoutes = (app) => {
   router.get('/', Directory.getAll);
   router.get('/:id', Directory.getById);
   router.post('/', Directory.create);
+  router.get('/getSops/:id', Directory.getSopsIdsByDirectoryId);
 
   app.use('/directory', router);
 };
