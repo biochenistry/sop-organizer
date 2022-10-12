@@ -126,17 +126,18 @@ const markForDeletion = (req, res) => {
       return res.status(401).send({ message: 'Unauthorized!' });
     }
     req.userId = decoded.id;
+    
+    Document.markForDeletion(req.params.id, req.userId, (err, document) => {
+      if (err) {
+        res.status(500).send({
+          message: "An error occurred while marking the document for deletion.",
+        });
+        return;
+      }
+      res.status(200).send('Document successfully marked for deletion.');
+    });
   });
 
-  Document.markForDeletion(req.params.id, req.userId, (err, document) => {
-    if (err) {
-      res.status(500).send({
-        message: "An error occurred while marking the document for deletion.",
-      });
-      return;
-    }
-    res.status(200).send('Document successfully marked for deletion.');
-  });
 }
 
 export default { getAll, getById, uploadNew, updateExisting , markForDeletion };
