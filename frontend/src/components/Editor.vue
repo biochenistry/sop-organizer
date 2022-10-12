@@ -1,7 +1,10 @@
 <template>
     <v-card v-if="file">
       <v-card-title class="headline justify-space-between" >
-        <v-btn color="primary" @click="this.editFile">{{editingFile ? "Cancel" : "Edit"}}</v-btn>
+        <v-btn color="primary" @click="editFile">{{editingFile ? "Cancel" : "Edit"}}</v-btn>
+        <v-btn v-if="!editingFile" @click="emitDeletion()" fab color="secondary" small>
+          <v-icon>mdi-trash-can</v-icon>
+        </v-btn>
         <v-btn color="primary" v-if="editingFile" @click="this.editFile">Save</v-btn>
       </v-card-title>
       <v-card-text :class="{ hide: (file == null || !editingFile) }">
@@ -28,6 +31,7 @@ export default defineComponent({
     data() {
       return {
         editingFile: false,
+        isShowingDeleteOverlay: false,
         toolbarOptions: [
           [{ 'font': [] }],
           [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
@@ -49,6 +53,9 @@ export default defineComponent({
         },
         saveFile() {
           
+        },
+        emitDeletion() {
+          this.$emit('delete-file');
         }
     },
     mounted() {

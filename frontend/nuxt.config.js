@@ -1,6 +1,5 @@
 export default {
   ssr: false,
-  target: 'static',
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     titleTemplate: '%s - SOP-Organizer',
@@ -55,4 +54,9 @@ export default {
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
   srcDir: 'src',
+  server: {
+    port: process.env.NUXT_ENV_PORT || 80, // requires sudo to start
+    host: '0.0.0.0',
+    timing: false
+  }
 };

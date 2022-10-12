@@ -10,7 +10,7 @@ export async function getDocuments(): Promise<Array<Document>> {
 
   const documents: Array<Document> = await res.json();
   return documents;
-}
+};
 
 export async function getDocument(id): Promise<Document> {
   const res = await fetch(`${BASE_URL}/documents/${id}`);
@@ -20,7 +20,7 @@ export async function getDocument(id): Promise<Document> {
 
   const document: Document = await res.json();
   return document;
-}
+};
 
 export async function uploadNew(data: any): Promise<Array<Document>> {
   const res = await fetch(`${BASE_URL}/documents/uploadNew`, {
@@ -33,7 +33,7 @@ export async function uploadNew(data: any): Promise<Array<Document>> {
 
   const documents: Array<Document> = await res.json();
   return documents;
-}
+};
 
 export async function updateExisting(data: any): Promise<Array<Document>> {
   const res = await fetch(`${BASE_URL}/documents/updateExisting`, {
@@ -46,4 +46,17 @@ export async function updateExisting(data: any): Promise<Array<Document>> {
 
   const documents: Array<Document> = await res.json();
   return documents;
-}
+};
+
+export async function markDeleteDocument(id): Promise<void> {
+  const res = await fetch(`${BASE_URL}/documents/mark-delete/${id}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${encodeURIComponent(window.localStorage.getItem('accessToken'))}`
+    }
+  });
+
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+};

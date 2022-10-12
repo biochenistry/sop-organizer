@@ -8,6 +8,7 @@ Create a `.env` file within the `frontend` folder. The file should define the fo
 
 ```text
 NUXT_ENV_API_URL="http://coms-402-sd-41.class.las.iastate.edu:8080"
+NUXT_ENV_PORT="3000"
 ```
 
 ```bash
@@ -20,8 +21,8 @@ $ npm install
 $ npm run dev
 
 # build for production and launch server
-$ npm run build
-$ npm run start
+$npm run build
+$ sudo npm run start # requires sudo because of port usage
 
 # generate static project
 $ npm run generate

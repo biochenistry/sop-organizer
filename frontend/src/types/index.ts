@@ -4,6 +4,7 @@ export interface Document {
   location: String;
   editor?: Number;
   version_number: Number;
+  marked_for_deletion_by_user_id?: Number;
 }
 
 export interface Directory {
