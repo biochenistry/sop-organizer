@@ -1,7 +1,7 @@
 <template>
     <v-card v-if="file">
       <v-card-title class="headline justify-space-between" >
-        <v-btn @click="this.selectFile">Upload File</v-btn>
+        <v-btn color="primary" @click="this.selectFile">Upload new version</v-btn>
         <input
           ref="uploadNew"
           type="file"
