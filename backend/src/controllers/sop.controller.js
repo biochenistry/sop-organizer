@@ -12,9 +12,8 @@ const create = (req, res) => {
   SOP.create(newSop, (err) => {
     if (err) {
       if (err.code === 'ER_DUP_ENTRY') {
-        res.status(409).send({ message: "Error: Duplicate SOP detected." })
-      }
-      else {
+        res.status(409).send({ message: 'Error: Duplicate SOP detected.' });
+      } else {
         res.status(500).send({
           message: 'An error occurred while creating the SOP.',
         });
@@ -49,13 +48,13 @@ const getAll = (req, res) => {
   SOP.getAll((err, sops) => {
     if (err) {
       res.status(500).send({
-        message: "An error occurred while fetching SOP's.",
+        message: 'An error occurred while fetching SOP\'s.',
       });
       return;
     }
 
     // Simply return the SOP's if the user didn't ask for the documents to be included
-    if (req.query.include_documents !== "true") {
+    if (req.query.include_documents !== 'true') {
       res.send(sops);
       return;
     }
@@ -80,13 +79,13 @@ const getById = (req, res) => {
   SOP.getById(req.params.id, (err, sop) => {
     if (err) {
       res.status(500).send({
-        message: "An error occurred while fetching an SOP.",
+        message: 'An error occurred while fetching an SOP.',
       });
       return;
     }
 
     // Simply return the SOP if the user didn't ask for the documents to be included
-    if (req.query.include_documents !== "true") {
+    if (req.query.include_documents !== 'true') {
       res.send(sop);
       return;
     }

@@ -68,7 +68,6 @@
           </v-btn>        
         </v-list-item>
         <v-list-item class="mx-auto">
-
           <v-btn>
             <v-icon large @click="isSidebarVisible = false"
               >mdi-chevron-left</v-icon
@@ -99,6 +98,7 @@
       @authenticationChange="checkAuthentication"
     ></login-modal>
     <RegisterModal v-if="showRegModal" @clearRegModal="showRegModal = false" />
+    <DirectoryModal v-if="showDirModal" @clearDirModal="showDirModal = false" />
   </v-app>
 </template>
 
@@ -106,7 +106,7 @@
 import { defineComponent } from 'vue';
 import LoginModal from '@/components/LoginModal.vue';
 import RegisterModal from '@/components/RegisterModal.vue';
-import CreateDirModal from "@/components/DirectoryModal.vue";
+import DirectoryModal from '@/components/DirectoryModal.vue';
 import Upload from '@/components/Upload.vue';
 import { SOP, Directory } from '@/types';
 // import { getDocuments } from '@/services/documents';
@@ -128,7 +128,12 @@ interface State {
 
 export default defineComponent({
   name: 'DefaultLayout',
-  components: { LoginModal, RegisterModal, CreateDirModal, Upload },
+  components: {
+    LoginModal,
+    RegisterModal,
+    Upload,
+    DirectoryModal,
+  },
   data() {
     return {
       isSidebarVisible: true,

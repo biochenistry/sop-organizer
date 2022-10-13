@@ -68,8 +68,7 @@ SOP.update = (id, updated_sop, resultCallback) => {
     if (err) {
       if (err.sqlMessage) {
         console.log(`SQL Error: ${err.sqlMessage}`);
-      }
-      else console.log(`Error: ${err.message}`);
+      } else console.log(`Error: ${err.message}`);
 
       resultCallback(err, null);
       return;
@@ -112,7 +111,6 @@ SOP.getById = (id, resultCallback) => {
   });
 };
 
-
 SOP.getByName = (name, resultCallback) => {
   sql.query('SELECT * FROM sops WHERE name = ? LIMIT 1', [name], (err, res) => {
     if (err) {
@@ -127,6 +125,6 @@ SOP.getByName = (name, resultCallback) => {
 
     resultCallback(undefined, res);
   });
-}
+};
 
 export default SOP;

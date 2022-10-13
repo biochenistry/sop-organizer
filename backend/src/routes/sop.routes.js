@@ -5,7 +5,7 @@ const router = Router();
 
 const SOPRoutes = (app) => {
   router.get('/', sops.getAll);
-  router.get('/:id', sops.getById)
+  router.get('/:id', sops.getById);
   router.post('/', sops.create);
   router.patch('/:id', sops.update);
 
