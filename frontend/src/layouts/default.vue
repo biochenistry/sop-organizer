@@ -160,8 +160,6 @@ export default defineComponent({
                     getSOP(sop.sop_id)
                       .then((sop) => {
                         directory['sops'].push(sop);
-                        console.log("I am sop");
-                        console.log(sop.name);
                         this.directories = directories;
                       })
                   })
