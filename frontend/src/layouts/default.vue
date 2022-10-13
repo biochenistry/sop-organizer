@@ -31,7 +31,7 @@
               <v-list-item
                 v-for="(sop, j) in directory.sops"
                 :key="`${directory}-${sop.name}-${j}`"
-                :to="`/document/${sop.latest_version_number}`"
+                :to="`/document/${sop.latest_version_document_id}`"
                 router  
                 exact
               >
