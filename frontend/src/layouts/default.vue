@@ -29,9 +29,9 @@
             <Upload :directory-name=directory.name :is-logged-in="isLoggedIn" @refresh="updateDocuments" />
             <v-list>
               <v-list-item
-                v-for="(doc, j) in directory.sops"
-                :key="`${directory}-${doc.name}-${j}`"
-                :to="`/document/${doc.id}`"
+                v-for="(sop, j) in directory.sops"
+                :key="`${directory}-${sop.name}-${j}`"
+                :to="`/document/${sop.latest_version_number}`"
                 router  
                 exact
               >
@@ -39,7 +39,7 @@
                   class="pl-4"
                   style="max-width: 100%; text-overflow: ellipsis"
                 >
-                <v-icon>mdi-file-document</v-icon> {{doc.name}}
+                <v-icon>mdi-file-document</v-icon> {{sop.name}}
                 </v-list-item-title>
               </v-list-item>
             </v-list>
@@ -160,6 +160,8 @@ export default defineComponent({
                     getSOP(sop.sop_id)
                       .then((sop) => {
                         directory['sops'].push(sop);
+                        console.log("I am sop");
+                        console.log(sop.name);
                         this.directories = directories;
                       })
                   })
