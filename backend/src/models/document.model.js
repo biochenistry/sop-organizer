@@ -24,8 +24,6 @@ Document.uploadNew = (newDocument, file, directoryName, resultCallback) => {
     // Move document into the specified directory under the given SOP id
     const path = `${STORAGE_DIR}/${directoryName}/${newDocument.sop_id}/`;
     const relativePath = `${directoryName}/${newDocument.sop_id}/`;
-    console.log(path);
-    console.log(relativePath);
 
     // Determine the new file name based on the version and the document extension
     const newFileName = `${newDocument.version_number}.${file.name.split(".").slice(-1)[0]}`;
@@ -74,9 +72,8 @@ Document.updateExisting = (newDocument, file, directoryName, resultCallback) => 
     }
 
     // Move document into directory
-    const path = `${STORAGE_DIR}/${newDocument.sop_id}/`;
-    const relativePath = `${newDocument.sop_id}/`;
-
+    const path = `${STORAGE_DIR}/${directoryName}/${newDocument.sop_id}/`;
+    const relativePath = `${directoryName}/${newDocument.sop_id}/`;
     if (!fs.existsSync(path)) {
       fs.mkdirSync(path);
     }
