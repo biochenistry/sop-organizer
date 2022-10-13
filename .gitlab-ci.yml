@@ -7,7 +7,9 @@ backend-build:
   stage: backendtry
   only:
     refs:
-      - master
+      - main
+    changes:
+      - backend/
   tags:
     - node
   script:
@@ -22,6 +24,8 @@ frontend-build:
   only:
     refs:
       - main
+    changes:
+      - frontend/
   tags:
    - vue
   script:
