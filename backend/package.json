@@ -32,5 +32,6 @@
     "nodemon": "^2.0.20",
     "prettier": "^2.7.1"
   },
-  "type": "module"
+  "type": "module",
+  "scripts": {"start": "node src/server.js"}
 }
