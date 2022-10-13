@@ -56,6 +56,7 @@ const updateExisting = (req, res) => {
   const file = req.files.file;
   const sopId = req.body.sop_id;
   const editorId = req.body.editor_id;
+  const directoryName = req.body.directory_name;
 
   // Find the latest version number to increment it
   SOP.getById(req.body.sop_id, (err, sop) => {
@@ -71,14 +72,13 @@ const updateExisting = (req, res) => {
     });
   
     // Upload document and put document into database
-    Document.upload(documentObject, file, (err, data) => {
+    Document.updateExisting(documentObject, file, directoryName, (err, data) => {
       if (err) {
         res.status(500).send({
           message: 'Error trying to upload the document.',
         });
         return;
       }
-  
       // Update the `latest_version_number` column on the SOP
       SOP.update(sopId, { latest_version_number: sop.latest_version_number + 1 }, (err) => {
         if (err) {
