@@ -18,7 +18,8 @@ const uploadNew = (req, res) => {
 
   // Create SOP object
   const sopObject = new SOP({
-    name: sopName
+    name: sopName,
+    latest_version_number: 1
   });
 
   // 1. Create a sub-directory for the SOP in the specified directory name
@@ -37,10 +38,19 @@ const uploadNew = (req, res) => {
 
     // 1. Put document in specificed sub-directory 
     // 2. Put document into database
-    Document.uploadNew(documentObject, file, directoryName, (err, data) => {
+    Document.uploadNew(documentObject, file, directoryName, (err, data2) => {
       if (err) return res.status(500).send({ message: 'An error occurred finding the linked SOP. Please retry upload.' });  
 
-      res.send(data);
+      console.log(data.insertId, data2.id);
+      SOP.update(data.insertId, { latest_version_document_id: data2.id }, (err) => {
+        if (err) {
+          res.status(500).send({
+            message: 'Error trying to upload the document.',
+          });
+          return;
+        }
+        res.send(data);
+      });
     });
   })
 };
@@ -80,7 +90,7 @@ const updateExisting = (req, res) => {
         return;
       }
       // Update the `latest_version_number` column on the SOP
-      SOP.update(sopId, { latest_version_number: sop.latest_version_number + 1 }, (err) => {
+      SOP.update(sopId, { latest_version_number: sop.latest_version_number + 1, latest_version_document_id: data.id }, (err) => {
         if (err) {
           res.status(500).send({
             message: 'Error trying to upload the document.',
