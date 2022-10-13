@@ -16,11 +16,9 @@
     </v-card>
 </template>
 
-
 <script lang="ts">
-
-import { defineComponent } from "vue";
-import * as Quill from "quill";
+import { defineComponent } from 'vue';
+import * as Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 
 export default defineComponent({
@@ -81,12 +79,10 @@ export default defineComponent({
       }
     }
 });
-
 </script>
 
 <style>
-  .hide {
-    display: none !important;
-  }
+.hide {
+  display: none !important;
+}
 </style>
-  

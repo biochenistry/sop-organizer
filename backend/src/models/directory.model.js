@@ -8,25 +8,25 @@ const Directory = function (directory) {
 };
 
 Directory.create = (newDir, resultCallback) => {
-    sql.query('INSERT INTO directories SET ?', newDir, (err, res) => {
-      if (err) {
-        console.log(`Error: ${err.message}`);
-        if (err.sqlMessage) {
-          console.log(`SQL Error: ${err.sqlMessage}`);
-        }
-  
-        resultCallback(err, null);
-        return;
+  sql.query('INSERT INTO directories SET ?', newDir, (err, res) => {
+    if (err) {
+      console.log(`Error: ${err.message}`);
+      if (err.sqlMessage) {
+        console.log(`SQL Error: ${err.sqlMessage}`);
       }
 
-    const path = `${STORAGE_DIR}/${newDir.name}/`;
-     if (!fs.existsSync(path)) {
-        fs.mkdirSync(path);
-     }
+      resultCallback(err, null);
+      return;
+    }
 
-      resultCallback(undefined);
-    });
-  };
+    const path = `${STORAGE_DIR}/${res.insertId}/`;
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path);
+    }
+
+    resultCallback(undefined);
+  });
+};
 
 Directory.getAll = (resultCallback) => {
   sql.query('SELECT * FROM directories', (err, res) => {
@@ -43,22 +43,27 @@ Directory.getAll = (resultCallback) => {
     resultCallback(undefined, res);
   });
 };
-  
+
 Directory.getById = (id, resultCallback) => {
-  sql.query('SELECT * FROM directories WHERE id = ? LIMIT 1', [id], (err, res) => {
-    if (err) {
-      console.log(`Error: ${err.message}`);
-      if (err.sqlMessage) {
-        console.log(`SQL Error: ${err.sqlMessage}`);
+  sql.query(
+    'SELECT * FROM directories WHERE id = ? LIMIT 1',
+    [id],
+    (err, res) => {
+      if (err) {
+        console.log(`Error: ${err.message}`);
+        if (err.sqlMessage) {
+          console.log(`SQL Error: ${err.sqlMessage}`);
+        }
+
+        resultCallback(err, null);
+        return;
       }
 
-      resultCallback(err, null);
-      return;
+      if (!res.length)
+        return resultCallback(new Error('Directory not found'), null);
+      resultCallback(undefined, JSON.parse(JSON.stringify(res[0])));
     }
-
-    if (!res.length) return resultCallback(new Error('Directory not found'), null);
-    resultCallback(undefined, JSON.parse(JSON.stringify(res[0])));
-  });
+  );
 };
 
 Directory.getSopsIdsByDirectoryId = (id, resultCallback) => {
@@ -77,5 +82,6 @@ Directory.getSopsIdsByDirectoryId = (id, resultCallback) => {
     resultCallback(undefined, res);
   });
 };
+
 
 export default Directory;

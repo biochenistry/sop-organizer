@@ -82,20 +82,37 @@ Document.updateExisting = (newDocument, file, directoryName, resultCallback) => 
     }
 
     // Determine the new file name based on the version and the document extension
-    const newFileName = `${newDocument.version_number}.${file.name.split(".").slice(-1)[0]}`;
+    const newFileName = `${newDocument.version_number}.${
+      file.name.split('.').slice(-1)[0]
+    }`;
 
     file.mv(`${path}/${newFileName}`, (err) => {
       if (err) return res.status(500).send(err);
       else {
-        console.log('Executing /home/sop/pandoc-2.19.2/bin/pandoc ' + (path + newFileName) + ' -o ' + path + newFileName.substring(0, newFileName.lastIndexOf('.')) + '.html')
-        exec('/home/sop/pandoc-2.19.2/bin/pandoc ' + (path + newFileName) + ' -o ' + path + newFileName.substring(0, newFileName.lastIndexOf('.')) + '.html', function (error, stdOut, stdErr){
-          console.log('stdout: ' + stdOut);
-          console.log('stderr: ' + stdErr);
-          if (error !== null) {
-            console.log('exec error: ' + error);
+        console.log(
+          'Executing /home/sop/pandoc-2.19.2/bin/pandoc ' +
+            (path + newFileName) +
+            ' -o ' +
+            path +
+            newFileName.substring(0, newFileName.lastIndexOf('.')) +
+            '.html'
+        );
+        exec(
+          '/home/sop/pandoc-2.19.2/bin/pandoc ' +
+            (path + newFileName) +
+            ' -o ' +
+            path +
+            newFileName.substring(0, newFileName.lastIndexOf('.')) +
+            '.html',
+          function (error, stdOut, stdErr) {
+            console.log('stdout: ' + stdOut);
+            console.log('stderr: ' + stdErr);
+            if (error !== null) {
+              console.log('exec error: ' + error);
+            }
+            return;
           }
-          return;
-        })
+        );
       }
     });
 
@@ -103,7 +120,7 @@ Document.updateExisting = (newDocument, file, directoryName, resultCallback) => 
       'UPDATE documents SET location = ? WHERE id = ?',
       [`${relativePath}${newFileName}`, res.insertId],
       (err) => {
-      // (err, res) => {
+        // (err, res) => {
         if (err) {
           console.log('Error: ', err);
           resultCallback(err, null);
@@ -116,26 +133,31 @@ Document.updateExisting = (newDocument, file, directoryName, resultCallback) => 
       id: res.insertId,
       ...newDocument,
     });
-  
+
     resultCallback(null, { id: res.insertId, ...newDocument });
   });
 };
 
 Document.getById = (id, resultCallback) => {
-  sql.query('SELECT * FROM documents WHERE id = ? LIMIT 1', [id], (err, res) => {
-    if (err) {
-      console.log(`Error: ${err.message}`);
-      if (err.sqlMessage) {
-        console.log(`SQL Error: ${err.sqlMessage}`);
+  sql.query(
+    'SELECT * FROM documents WHERE id = ? LIMIT 1',
+    [id],
+    (err, res) => {
+      if (err) {
+        console.log(`Error: ${err.message}`);
+        if (err.sqlMessage) {
+          console.log(`SQL Error: ${err.sqlMessage}`);
+        }
+
+        resultCallback(err, null);
+        return;
       }
 
-      resultCallback(err, null);
-      return;
+      if (!res.length)
+        return resultCallback(new Error('Document not found'), null);
+      resultCallback(undefined, JSON.parse(JSON.stringify(res[0])));
     }
-
-    if (!res.length) return resultCallback(new Error('Document not found'), null);
-    resultCallback(undefined, JSON.parse(JSON.stringify(res[0])));
-  });
+  );
 };
 
 Document.getAll = (resultCallback) => {

@@ -59,7 +59,13 @@ const updateExisting = (req, res) => {
 
   // Find the latest version number to increment it
   SOP.getById(req.body.sop_id, (err, sop) => {
-    if (err) return res.status(500).send({ message: 'An error occurred finding the linked SOP. Please retry upload.' });
+    if (err)
+      return res
+        .status(500)
+        .send({
+          message:
+            'An error occurred finding the linked SOP. Please retry upload.',
+        });
 
     // Create document object
     const documentObject = new Document({
@@ -78,17 +84,21 @@ const updateExisting = (req, res) => {
         });
         return;
       }
-  
+
       // Update the `latest_version_number` column on the SOP
-      SOP.update(sopId, { latest_version_number: sop.latest_version_number + 1 }, (err) => {
-        if (err) {
-          res.status(500).send({
-            message: 'Error trying to upload the document.',
-          });
-          return;
+      SOP.update(
+        sopId,
+        { latest_version_number: sop.latest_version_number + 1 },
+        (err) => {
+          if (err) {
+            res.status(500).send({
+              message: 'Error trying to upload the document.',
+            });
+            return;
+          }
+          res.send(data);
         }
-        res.send(data);
-      });
+      );
     });
   });
 };
@@ -109,7 +119,7 @@ const getById = (req, res) => {
   Document.getById(req.params.id, (err, document) => {
     if (err) {
       res.status(500).send({
-        message: "An error occurred while fetching a document.",
+        message: 'An error occurred while fetching a document.',
       });
       return;
     }

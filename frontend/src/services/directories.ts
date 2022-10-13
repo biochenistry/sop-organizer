@@ -15,6 +15,10 @@ export async function getDirectories(): Promise<Array<any>> {
 export async function createDirectories(directory: Directory): Promise<void> {
     const res = await fetch(`${BASE_URL}/directory/`, {
         method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
         body: JSON.stringify(directory)
     });
     if (!res.ok) {

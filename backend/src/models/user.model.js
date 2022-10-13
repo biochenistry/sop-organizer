@@ -23,19 +23,22 @@ User.create = (newUser, resultCallback) => {
 };
 
 User.update = (id, updated_user, resultCallback) => {
-  sql.query('UPDATE users SET ? WHERE id = ?', [updated_user, id], (err, res) => {
-    if (err) {
-      if (err.sqlMessage) {
-        console.log(`SQL Error: ${err.sqlMessage}`);
+  sql.query(
+    'UPDATE users SET ? WHERE id = ?',
+    [updated_user, id],
+    (err, res) => {
+      if (err) {
+        if (err.sqlMessage) {
+          console.log(`SQL Error: ${err.sqlMessage}`);
+        } else console.log(`Error: ${err.message}`);
+
+        resultCallback(err, null);
+        return;
       }
-      else console.log(`Error: ${err.message}`);
 
-      resultCallback(err, null);
-      return;
+      resultCallback(undefined);
     }
-
-    resultCallback(undefined);
-  });
+  );
 };
 
 User.getAll = (resultCallback) => {

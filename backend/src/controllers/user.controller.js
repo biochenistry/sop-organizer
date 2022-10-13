@@ -11,9 +11,8 @@ const create = (req, res) => {
   User.create(newUser, (err) => {
     if (err) {
       if (err.code === 'ER_DUP_ENTRY') {
-        res.status(409).send({ message: "Error: Duplicate User detected." })
-      }
-      else {
+        res.status(409).send({ message: 'Error: Duplicate User detected.' });
+      } else {
         res.status(500).send({
           message: 'An error occurred while creating the User.',
         });
@@ -23,7 +22,6 @@ const create = (req, res) => {
     }
   });
 };
-
 
 const update = (req, res) => {
   if (!req.body) {
@@ -44,7 +42,7 @@ const update = (req, res) => {
   });
 };
 
-  // TODO - consider making this admin only feature or removing
+// TODO - consider making this admin only feature or removing
 const getAll = (req, res) => {
   User.getAll((err, data) => {
     if (err) {
@@ -61,7 +59,7 @@ const getById = (req, res) => {
   User.getById(req.params.id, (err, user) => {
     if (err) {
       res.status(500).send({
-        message: "An error occurred while fetching the user.",
+        message: 'An error occurred while fetching the user.',
       });
       return;
     }
