@@ -157,12 +157,10 @@ export default defineComponent({
             getSops(directory['id'])
               .then((sops) => {
                   sops.forEach( (sop, sopIndex) => {
-                    console.log(sop);
                     getSOP(sop.sop_id)
                       .then((sop) => {
                         directory['sops'].push(sop);
                         this.directories = directories;
-                        console.log(directories);
                       })
                   })
               })
