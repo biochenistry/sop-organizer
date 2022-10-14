@@ -4,7 +4,7 @@
       <v-card>
         <v-card-title>
           {{ sop.name }}<v-spacer></v-spacer>
-          <v-select v-model="selectedVersion" :items="versions" item-text="version_number" return-object outlined ></v-select>
+          <v-select @change="onVersionChange($event)" v-model="selectedVersion" :items="versions" item-text="version_number" return-object outlined ></v-select>
         </v-card-title>
         <v-card-subtitle>
           Original filename: {{ document.original_file_name }}
@@ -83,7 +83,6 @@ export default {
       })
       selectedVersion = document;
       selectedVersion.version_number = "Version " + selectedVersion.version_number;
-      console.log(selectedVersion)
     } catch (err) {
       error({
         statusCode: 500,
@@ -122,6 +121,9 @@ export default {
       .finally(() => {
         this.isAwaitingDeletionCall = false;
       });
+    },
+    onVersionChange(event) {
+      this.$router.push("/document/" + event.id);
     }
   },
   head() {
