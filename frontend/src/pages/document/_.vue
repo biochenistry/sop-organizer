@@ -3,8 +3,8 @@
     <v-col cols="12" sm="8" md="6">
       <v-card>
         <v-card-title>
-          {{ sop.name }}<v-spacer></v-spacer>Version
-          {{ document.version_number }}
+          {{ sop.name }}<v-spacer></v-spacer>
+          <v-select :items="versions" label="Versions" outlined ></v-select>
         </v-card-title>
         <v-card-subtitle>
           Original filename: {{ document.original_file_name }}
@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import { getDocument, markDeleteDocument } from '~/services/documents';
+import { getDocument, getDocuments, markDeleteDocument, getDocumentsWithSopId } from '~/services/documents';
 import { getFile } from '~/services/files';
 import { getSOP } from '~/services/sops';
 
@@ -64,7 +64,8 @@ export default {
   data() {
     return {
       isShowingDeleteOverlay: false,
-      isAwaitingDeletionCall: false
+      isAwaitingDeletionCall: false,
+      versions: []
     }
   },
   async asyncData({ params, error }) {
@@ -75,6 +76,9 @@ export default {
       document = await getDocument(documentId);
       sop = await getSOP(document.sop_id);
       file = await getFile(document.location);
+      const versions = await getDocumentsWithSopId(sop.id);
+      
+
     } catch (err) {
       error({
         statusCode: 500,
