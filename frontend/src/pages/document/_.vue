@@ -4,7 +4,7 @@
       <v-card>
         <v-card-title>
           {{ sop.name }}<v-spacer></v-spacer>Version
-          {{ sop.latest_version_number }}
+          {{ document.version_number }}
         </v-card-title>
         <v-card-subtitle>
           Original filename: {{ document.original_file_name }}
