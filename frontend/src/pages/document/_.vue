@@ -4,7 +4,7 @@
       <v-card>
         <v-card-title>
           {{ sop.name }}<v-spacer></v-spacer>
-          <v-select :items="versions" label="Versions" outlined ></v-select>
+          <v-select v-model="selectedVersion" :items="versions" item-text="version_number" return-object outlined ></v-select>
         </v-card-title>
         <v-card-subtitle>
           Original filename: {{ document.original_file_name }}
@@ -65,20 +65,25 @@ export default {
     return {
       isShowingDeleteOverlay: false,
       isAwaitingDeletionCall: false,
-      versions: []
+      versions: [],
+      selectedVersion: {}
     }
   },
   async asyncData({ params, error }) {
     const documentId = params.pathMatch;
-    let sop, document, file;
+    let sop, document, file, selectedVersion, versions;
 
     try {
       document = await getDocument(documentId);
       sop = await getSOP(document.sop_id);
       file = await getFile(document.location);
-      const versions = await getDocumentsWithSopId(sop.id);
-      
-
+      versions = await getDocumentsWithSopId(sop.id);
+      versions.map((doc_version) => {
+        doc_version.version_number = "Version " + doc_version.version_number;
+      })
+      selectedVersion = document;
+      selectedVersion.version_number = "Version " + selectedVersion.version_number;
+      console.log(selectedVersion)
     } catch (err) {
       error({
         statusCode: 500,
@@ -92,6 +97,8 @@ export default {
       documentId,
       document,
       file,
+      versions,
+      selectedVersion
     };
   },
   methods: {
