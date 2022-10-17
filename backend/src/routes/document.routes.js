@@ -9,6 +9,7 @@ const DocumentRoutes = (app) => {
   router.patch('/mark-delete/:id', documents.markForDeletion);
   router.post('/uploadNew', documents.uploadNew);
   router.post('/updateExisting', documents.updateExisting);
+  router.post('/save', documents.save);
 
   app.use('/documents', router);
 };

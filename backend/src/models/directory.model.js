@@ -19,7 +19,7 @@ Directory.create = (newDir, resultCallback) => {
       return;
     }
 
-    const path = `${STORAGE_DIR}/${res.insertId}/`;
+    const path = `${STORAGE_DIR}/${newDir.name}/`;
     if (!fs.existsSync(path)) {
       fs.mkdirSync(path);
     }

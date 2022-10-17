@@ -41,7 +41,7 @@ export async function uploadNew(data: any): Promise<Array<Document>> {
   return documents;
 };
 
-export async function updateExisting(data: any): Promise<Array<Document>> {
+export async function updateExisting(data: any): Promise<any> {
   const res = await fetch(`${BASE_URL}/documents/updateExisting`, {
     method: 'POST',
     body: data,
@@ -49,9 +49,21 @@ export async function updateExisting(data: any): Promise<Array<Document>> {
   if (!res.ok) {
     throw new Error(res.statusText);
   }
+  const newDocumentId = await res.json();
+  return newDocumentId;
 
-  const documents: Array<Document> = await res.json();
-  return documents;
+};
+
+export async function save(data: any): Promise<any> {
+  const res = await fetch(`${BASE_URL}/documents/save`, {
+    method: 'POST',
+    body: data,
+  });
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+  const newDocumentId = await res.json();
+  return newDocumentId;
 };
 
 export async function markDeleteDocument(id): Promise<void> {
