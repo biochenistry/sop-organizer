@@ -1,8 +1,17 @@
 <template>
     <v-card v-if="file">
       <v-card-title class="headline justify-space-between" >
-        <v-btn color="primary" @click="editFile">{{editingFile ? "Cancel" : "Edit"}}</v-btn>
-        <v-btn v-if="!editingFile" @click="emitDeletion()" :disabled="Boolean(document.marked_for_deletion_by_user_id)" fab color="secondary" small>
+        <v-btn color="primary" @click="this.selectFile">Upload new version</v-btn>
+        <input
+          ref="uploadNew"
+          type="file"
+          hidden
+          @change="this.rememberFileSelection"
+        />
+      </v-card-title>
+      <v-card-title class="headline justify-space-between" >
+        <v-btn color="primary" @click="this.editFile">{{editingFile ? "Cancel" : "Edit"}}</v-btn>
+        <v-btn v-if="!editingFile" @click="this.emitDeletion" :disabled="Boolean(document.marked_for_deletion_by_user_id)" fab color="secondary" small>
           <v-icon>mdi-trash-can</v-icon>
         </v-btn>
         <v-btn color="primary" v-if="editingFile" @click="this.editFile">Save</v-btn>
@@ -20,17 +29,21 @@
 import { defineComponent } from 'vue';
 import * as Quill from 'quill';
 import 'quill/dist/quill.snow.css';
+import { updateExisting } from "~/services/documents";
 
 export default defineComponent({
     name: 'Editor',
     props: {
       file: undefined,
-      document: undefined
+      document: undefined,
     },
     data() {
       return {
         editingFile: false,
         isShowingDeleteOverlay: false,
+        selectedFile: undefined,
+        fileData: undefined,
+        isSelecting: false,
         toolbarOptions: [
           [{ 'font': [] }],
           [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
@@ -55,7 +68,39 @@ export default defineComponent({
         },
         emitDeletion() {
           this.$emit('delete-file');
-        }
+        },
+
+        selectFile() {
+          this.isSelecting = true;
+          window.addEventListener(
+            'focus',
+            () => {
+              this.isSelecting = false;
+            },
+            { once: true }
+          );
+          this.$refs.uploadNew.click();
+        },
+        rememberFileSelection(event) {
+          this.selectedFile = event.target.files[0];
+          this.fileData = new FormData();
+          this.fileData.append('file', this.selectedFile);
+          this.uploadNew();
+        },
+        uploadNew() {
+          this.fileData.append('sop_id', this.document['sop_id']);
+          this.fileData.append('editor_id', 1);
+          this.fileData.append('directory_name', this.document.location.split('/')[0])
+          updateExisting(this.fileData)
+            .catch((err) => {
+              console.log(err);
+              // TODO - handle errors properly
+            })
+            .finally(() => {
+              this.$emit('refresh');
+            });
+        },
+
     },
     mounted() {
       if(this.file) {

@@ -23,7 +23,8 @@ create table if not exists sop_database.sops (
     id int NOT NULL unique AUTO_INCREMENT,
     name varchar(255) NOT NULL unique,
     description varchar(255),
-    latest_version_number int default 0,
+    latest_version_number int default 1,
+    latest_version_document_id int,
     PRIMARY KEY (id)
 );
 

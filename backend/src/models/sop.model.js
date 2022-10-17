@@ -5,6 +5,7 @@ const STORAGE_DIR = `${process.env.PROJECT_PATH}/sop-files/`;
 
 const SOP = function (sop) {
   this.name = sop.name;
+  this.latest_version_number = sop.latest_version_number;
   this.description = sop.description;
 };
 

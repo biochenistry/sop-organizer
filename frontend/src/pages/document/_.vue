@@ -3,8 +3,8 @@
     <v-col cols="12" sm="8" md="6">
       <v-card>
         <v-card-title>
-          {{ sop.name }}<v-spacer></v-spacer>Version
-          {{ document.version_number }}
+          {{ sop.name }}<v-spacer></v-spacer>
+          <v-select @change="onVersionChange($event)" v-model="selectedVersion" :items="versions" item-text="version_number" return-object outlined ></v-select>
         </v-card-title>
         <v-card-subtitle>
           Original filename: {{ document.original_file_name }}
@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import { getDocument, markDeleteDocument } from '~/services/documents';
+import { getDocument, getDocuments, markDeleteDocument, getDocumentsWithSopId } from '~/services/documents';
 import { getFile } from '~/services/files';
 import { getSOP } from '~/services/sops';
 
@@ -64,17 +64,25 @@ export default {
   data() {
     return {
       isShowingDeleteOverlay: false,
-      isAwaitingDeletionCall: false
+      isAwaitingDeletionCall: false,
+      versions: [],
+      selectedVersion: {}
     }
   },
   async asyncData({ params, error }) {
     const documentId = params.pathMatch;
-    let sop, document, file;
+    let sop, document, file, selectedVersion, versions;
 
     try {
       document = await getDocument(documentId);
       sop = await getSOP(document.sop_id);
       file = await getFile(document.location);
+      versions = await getDocumentsWithSopId(sop.id);
+      versions.map((doc_version) => {
+        doc_version.version_number = "Version " + doc_version.version_number;
+      })
+      selectedVersion = document;
+      selectedVersion.version_number = "Version " + selectedVersion.version_number;
     } catch (err) {
       error({
         statusCode: 500,
@@ -88,6 +96,8 @@ export default {
       documentId,
       document,
       file,
+      versions,
+      selectedVersion
     };
   },
   methods: {
@@ -111,6 +121,9 @@ export default {
       .finally(() => {
         this.isAwaitingDeletionCall = false;
       });
+    },
+    onVersionChange(event) {
+      this.$router.push(`/document/${event.id}`);
     }
   },
   head() {

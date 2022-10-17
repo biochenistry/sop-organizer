@@ -12,6 +12,12 @@ export async function getDocuments(): Promise<Array<Document>> {
   return documents;
 };
 
+export async function getDocumentsWithSopId(sop_id): Promise<Array<Document>> {
+  const documents = await getDocuments();
+  console.log(documents.filter(document => document.sop_id === sop_id));
+  return documents.filter(document => document.sop_id === sop_id);
+};
+
 export async function getDocument(id): Promise<Document> {
   const res = await fetch(`${BASE_URL}/documents/${id}`);
   if (!res.ok) {
