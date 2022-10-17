@@ -123,7 +123,7 @@ export default {
       });
     },
     onVersionChange(event) {
-      this.$router.push("/document/" + event.id);
+      this.$router.push(`/document/${event.id}`);
     }
   },
   head() {
