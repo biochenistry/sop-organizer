@@ -65,6 +65,7 @@ const signout = (req, res) => {
 
 const changePermission = (req, res) => {
   try {
+    let email = req.body.email;
     connection.query(
       `SELECT email FROM users WHERE email = '${email}'`,
       function (err, result) {
@@ -75,13 +76,27 @@ const changePermission = (req, res) => {
           connection.query(
             `UPDATE users
         SET privilege = ${req.body.newprivilege}
-        WHERE email = ${req.body.email};`,
+        WHERE email = '${req.body.email}';`,
             function (err, result) {
               if (err) throw err;
               return res.send('user privilege updated.');
             }
           );
         }
+      }
+    );
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+};
+
+const removeFile = (req, res) => {
+  try {
+    connection.query(
+      `DELETE FROM documents WHERE id = ${req.body.id};`,
+      function (err, result) {
+        if (err) throw err;
+        return res.send('Deleted Row(s): ' + result.affectedRows);
       }
     );
   } catch (error) {
@@ -118,4 +133,4 @@ const register = (req, res) => {
     res.status(500).send({ message: error.message });
   }
 };
-export default { signin, signout, register };
+export default { signin, signout, register, changePermission, removeFile };

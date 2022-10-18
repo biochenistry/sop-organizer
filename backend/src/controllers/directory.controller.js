@@ -60,4 +60,4 @@ const getSopsIdsByDirectoryId = (req, res) => {
   });
 };
 
-export default { create , getAll, getById, getSopsIdsByDirectoryId };
+export default { create, getAll, getById, getSopsIdsByDirectoryId };

@@ -1,6 +1,6 @@
 import sql from './db.js';
 import fs from 'fs';
-import {exec} from 'child_process';
+import { exec } from 'child_process';
 import { relative } from 'path';
 
 const STORAGE_DIR = `${process.env.PROJECT_PATH}/sop-files/`;
@@ -27,7 +27,9 @@ Document.uploadNew = (newDocument, file, directoryName, resultCallback) => {
     const relativePath = `${directoryName}/${newDocument.sop_id}/`;
 
     // Determine the new file name based on the version and the document extension
-    const newFileName = `${newDocument.version_number}.${file.name.split(".").slice(-1)[0]}`;
+    const newFileName = `${newDocument.version_number}.${
+      file.name.split('.').slice(-1)[0]
+    }`;
 
     file.mv(`${path}/${newFileName}`, (err) => {
       if (err) return res.status(500).send(err);
@@ -50,21 +52,36 @@ Document.uploadNew = (newDocument, file, directoryName, resultCallback) => {
               return;
             }
           }
-        );
-    
-        console.log('Database received a new document: ', {
-          id: res.insertId,
-          ...newDocument,
-        });        
-        resultCallback(null, { id: res.insertId, ...newDocument });
-      })
+          sql.query(
+            'UPDATE documents SET location = ? WHERE id = ?',
+            [`${relativePath}${newFileName}`, res.insertId],
+            (err) => {
+              // (err, res) => {
+              if (err) {
+                console.log('Error: ', err);
+                resultCallback(err, null);
+                return;
+              }
+            }
+          );
 
+          console.log('Database received a new document: ', {
+            id: res.insertId,
+            ...newDocument,
+          });
+          resultCallback(null, { id: res.insertId, ...newDocument });
+        }
+      );
     });
   });
 };
 
-
-Document.updateExisting = (newDocument, file, directoryName, resultCallback) => {
+Document.updateExisting = (
+  newDocument,
+  file,
+  directoryName,
+  resultCallback
+) => {
   sql.query('INSERT INTO documents SET ?', newDocument, (err, res) => {
     if (err) {
       console.log(`Error: ${err}`);
@@ -238,21 +255,24 @@ Document.getAll = (resultCallback) => {
   });
 };
 
-
 Document.markForDeletion = (id, userId, resultCallback) => {
-  sql.query('UPDATE documents SET marked_for_deletion_by_user_id = ? WHERE id = ?', [userId, id], (err, res) => {
-    if (err) {
-      console.log(`Error: ${err.message}`);
-      if (err.sqlMessage) {
-        console.log(`SQL Error: ${err.sqlMessage}`);
+  sql.query(
+    'UPDATE documents SET marked_for_deletion_by_user_id = ? WHERE id = ?',
+    [userId, id],
+    (err, res) => {
+      if (err) {
+        console.log(`Error: ${err.message}`);
+        if (err.sqlMessage) {
+          console.log(`SQL Error: ${err.sqlMessage}`);
+        }
+
+        resultCallback(err, null);
+        return;
       }
 
-      resultCallback(err, null);
-      return;
+      resultCallback(undefined, res);
     }
-
-    resultCallback(undefined, res);
-  });
+  );
 };
 
 export default Document;

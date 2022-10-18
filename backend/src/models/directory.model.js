@@ -67,20 +67,25 @@ Directory.getById = (id, resultCallback) => {
 };
 
 Directory.getSopsIdsByDirectoryId = (id, resultCallback) => {
-  sql.query('SELECT sop_id FROM directory_sop WHERE directory_id = ?', [id], (err, res) => {
-    if (err) {
-      console.log(`Error: ${err.message}`);
-      if (err.sqlMessage) {
-        console.log(`SQL Error: ${err.sqlMessage}`);
+  sql.query(
+    'SELECT sop_id FROM directory_sop WHERE directory_id = ?',
+    [id],
+    (err, res) => {
+      if (err) {
+        console.log(`Error: ${err.message}`);
+        if (err.sqlMessage) {
+          console.log(`SQL Error: ${err.sqlMessage}`);
+        }
+
+        resultCallback(err, null);
+        return;
       }
 
-      resultCallback(err, null);
-      return;
+      if (!res.length)
+        return resultCallback(new Error('Directory not found'), null);
+      resultCallback(undefined, res);
     }
-
-    if (!res.length) return resultCallback(new Error('Directory not found'), null);
-    resultCallback(undefined, res);
-  });
+  );
 };
 
 

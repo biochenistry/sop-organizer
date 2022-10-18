@@ -12,6 +12,10 @@ const AuthRoutes = (app) => {
 
   router.post('/register', auth.register);
 
+  router.post('/perms', jwt.verifyToken, jwt.isAdmin, auth.changePermission);
+
+  router.delete('/removefile', jwt.verifyToken, jwt.isAdmin, auth.removeFile);
+
   app.use('/auth', router);
 };
 export default AuthRoutes;

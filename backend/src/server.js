@@ -12,7 +12,6 @@ import AuthRoutes from './routes/auth.routes.js';
 
 const PORT = process.env.PORT || 8080;
 const app = express();
-
 app.use(fileUpload(), cors(), bodyParser.json());
 app.use('/files', express.static(`${process.env.PROJECT_PATH}/sop-files`));
 
