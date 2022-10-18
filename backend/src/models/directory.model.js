@@ -88,5 +88,4 @@ Directory.getSopsIdsByDirectoryId = (id, resultCallback) => {
   );
 };
 
-
 export default Directory;

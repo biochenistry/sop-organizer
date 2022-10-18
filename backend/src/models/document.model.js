@@ -34,24 +34,39 @@ Document.uploadNew = (newDocument, file, directoryName, resultCallback) => {
     file.mv(`${path}/${newFileName}`, (err) => {
       if (err) return res.status(500).send(err);
 
-      console.log(`${PANDOC_DIR} ` + (path + newFileName) + ' -o ' + path + newFileName.substring(0, newFileName.lastIndexOf('.')) + '.html')
-      exec(`${PANDOC_DIR} ` + (path + newFileName) + ' -o ' + path + newFileName.substring(0, newFileName.lastIndexOf('.')) + '.html', function (error, stdOut, stdErr){
-        if (error !== null) {
-          console.log('exec error: ' + error);
-          console.log('stdout: ' + stdOut);
-          console.log('stderr: ' + stdErr);  
-        }
-        sql.query(
-          'UPDATE documents SET location = ? WHERE id = ?',
-          [`${relativePath}${newFileName}`, res.insertId],
-          (err) => {
-          // (err, res) => {
-            if (err) {
-              console.log('Error: ', err);
-              resultCallback(err, null);
-              return;
-            }
+      console.log(
+        `${PANDOC_DIR} ` +
+          (path + newFileName) +
+          ' -o ' +
+          path +
+          newFileName.substring(0, newFileName.lastIndexOf('.')) +
+          '.html'
+      );
+      exec(
+        `${PANDOC_DIR} ` +
+          (path + newFileName) +
+          ' -o ' +
+          path +
+          newFileName.substring(0, newFileName.lastIndexOf('.')) +
+          '.html',
+        function (error, stdOut, stdErr) {
+          if (error !== null) {
+            console.log('exec error: ' + error);
+            console.log('stdout: ' + stdOut);
+            console.log('stderr: ' + stdErr);
           }
+          sql.query(
+            'UPDATE documents SET location = ? WHERE id = ?',
+            [`${relativePath}${newFileName}`, res.insertId],
+            (err) => {
+              // (err, res) => {
+              if (err) {
+                console.log('Error: ', err);
+                resultCallback(err, null);
+                return;
+              }
+            }
+          );
           sql.query(
             'UPDATE documents SET location = ? WHERE id = ?',
             [`${relativePath}${newFileName}`, res.insertId],
@@ -106,53 +121,58 @@ Document.updateExisting = (
         console.log(`Error: ${err}`);
         resultCallback(err, null);
         return;
-      }
-      else {
+      } else {
         // console.log(`${PANDOC_DIR} ` + (path + newFileName) + ' -o ' + path + newFileName.substring(0, newFileName.lastIndexOf('.')) + '.html');
-        exec(`${PANDOC_DIR} ` + (path + newFileName) + ' -o ' + path + newFileName.substring(0, newFileName.lastIndexOf('.')) + '.html', function (error, stdOut, stdErr){
-          if (error !== null) {
-            console.log('stdout: ' + stdOut);
-            console.log('stderr: ' + stdErr);
-            console.log('pandoc error: ' + error);
-            resultCallback(err, null);
-            return;
-          }
-          sql.query(
-            'UPDATE documents SET location = ? WHERE id = ?',
-            [`${relativePath}${newFileName}`, res.insertId],
-            (err) => {
-              if (err) {
-                console.log('Error: ', err);
-                resultCallback(err, null);
-                return;
-              }
-              else {
-                sql.query(
-                  'UPDATE sops SET latest_version_document_id = ? WHERE id = ?',
-                  [res.insertId, newDocument.sop_id],
-                  (err) => {
-                    if (err) {
-                      console.log('Error: ', err);
-                      resultCallback(err, null);
-                      return;
-                    }
-                    else {
-                      newDocument.location = `${relativePath}${newFileName}`;
-                      console.log('Database received a new document: ', {
-                        id: res.insertId,
-                        ...newDocument,
-                      });
-                      resultCallback(undefined, res);
-                      return;
-                    }
-                  }
-                );
-              }
+        exec(
+          `${PANDOC_DIR} ` +
+            (path + newFileName) +
+            ' -o ' +
+            path +
+            newFileName.substring(0, newFileName.lastIndexOf('.')) +
+            '.html',
+          function (error, stdOut, stdErr) {
+            if (error !== null) {
+              console.log('stdout: ' + stdOut);
+              console.log('stderr: ' + stdErr);
+              console.log('pandoc error: ' + error);
+              resultCallback(err, null);
+              return;
             }
-          );
-        });
+            sql.query(
+              'UPDATE documents SET location = ? WHERE id = ?',
+              [`${relativePath}${newFileName}`, res.insertId],
+              (err) => {
+                if (err) {
+                  console.log('Error: ', err);
+                  resultCallback(err, null);
+                  return;
+                } else {
+                  sql.query(
+                    'UPDATE sops SET latest_version_document_id = ? WHERE id = ?',
+                    [res.insertId, newDocument.sop_id],
+                    (err) => {
+                      if (err) {
+                        console.log('Error: ', err);
+                        resultCallback(err, null);
+                        return;
+                      } else {
+                        newDocument.location = `${relativePath}${newFileName}`;
+                        console.log('Database received a new document: ', {
+                          id: res.insertId,
+                          ...newDocument,
+                        });
+                        resultCallback(undefined, res);
+                        return;
+                      }
+                    }
+                  );
+                }
+              }
+            );
+          }
+        );
       }
-    });    
+    });
   });
 };
 
@@ -187,8 +207,7 @@ Document.save = (newDocument, file, directoryName, resultCallback) => {
               console.log('Error: ', err);
               resultCallback(err, null);
               return;
-            }
-            else {
+            } else {
               sql.query(
                 'UPDATE sops SET latest_version_document_id = ? WHERE id = ?',
                 [res.insertId, newDocument.sop_id],
@@ -197,8 +216,7 @@ Document.save = (newDocument, file, directoryName, resultCallback) => {
                     console.log('Error: ', err);
                     resultCallback(err, null);
                     return;
-                  }
-                  else {
+                  } else {
                     newDocument.location = `${relativePath}${newFileName}`;
                     console.log('Database received a new document: ', {
                       id: res.insertId,
