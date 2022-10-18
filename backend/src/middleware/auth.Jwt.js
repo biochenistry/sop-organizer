@@ -1,11 +1,9 @@
 import jwt from 'jsonwebtoken';
-import ResultSet from 'mysql/lib/protocol/ResultSet.js';
 import config from '../config/auth.config.js';
-import db from '../models/db.js';
-const User = db.user;
+import connection from '../models/db.js';
 
 const verifyToken = (req, res, next) => {
-  let token = req.session.token;
+  let token = req.headers['token'];
 
   if (!token) {
     return res.status(403).send({
@@ -16,32 +14,33 @@ const verifyToken = (req, res, next) => {
   jwt.verify(token, config.secret, (err, decoded) => {
     if (err) {
       return res.status(401).send({
-        message: 'Unauthorized!',
+        message: 'Token provided is not valid!',
       });
     }
-    req.userId = decoded.id;
+    req.requesterID = decoded.id;
     next();
   });
 };
 
-const isAdmin = (req, res, next) => {
+const isAdmin = async (req, res, next) => {
+  let ID = req.requesterID;
   try {
-    let privilege = connection.query(
-      `SELECT privilege FROM users WHERE email = '${email}'`,
+    connection.query(
+      `SELECT privilege FROM users WHERE id = '${ID}'`,
       function (err, result) {
         if (err) throw err;
-        return result.privilege;
+        req.requester = result[0].privilege;
+        if ((req.requester = '<Buffer 01>')) {
+          return next();
+        } else {
+          return res.status(403).send({
+            message: 'Require Admin Role!',
+          });
+        }
       }
     );
-
-    if (privilege == 1) {
-      return next();
-    }
-
-    return res.status(403).send({
-      message: 'Require Admin Role!',
-    });
   } catch (error) {
+    console.log(error);
     return res.status(500).send({
       message: 'Unable to validate User role!',
     });

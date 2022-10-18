@@ -25,7 +25,13 @@ const uploadNew = (req, res) => {
   // 1. Create a sub-directory for the SOP in the specified directory name
   // 2. Put SOP object into database
   SOP.create(sopObject, directoryName, (err, data) => {
-    if (err) return res.status(500).send({ message: 'An error occurred finding the linked SOP. Please retry upload.' });
+    if (err)
+      return res
+        .status(500)
+        .send({
+          message:
+            'An error occurred finding the linked SOP. Please retry upload.',
+        });
 
     // Create document object
     const documentObject = new Document({
@@ -36,7 +42,7 @@ const uploadNew = (req, res) => {
       version_number: 1,
     });
 
-    // 1. Put document in specificed sub-directory 
+    // 1. Put document in specificed sub-directory
     // 2. Put document into database
     Document.uploadNew(documentObject, file, directoryName, (err, data2) => {
       if (err) return res.status(500).send({ message: 'An error occurred finding the linked SOP. Please retry upload.' });  
@@ -51,7 +57,7 @@ const uploadNew = (req, res) => {
         res.send(data);
       });
     });
-  })
+  });
 };
 
 const updateExisting = (req, res) => {
@@ -85,7 +91,7 @@ const updateExisting = (req, res) => {
       sop_id: sopId,
       version_number: sop.latest_version_number + 1,
     });
-  
+
     // Upload document and put document into database
     Document.updateExisting(documentObject, file, directoryName, (err, data) => {
       if (err) {
@@ -199,17 +205,18 @@ const markForDeletion = (req, res) => {
       return res.status(401).send({ message: 'Unauthorized!' });
     }
     req.userId = decoded.id;
-    
+
     Document.markForDeletion(req.params.id, req.userId, (err, document) => {
       if (err) {
         res.status(500).send({
-          message: "An error occurred while marking the document for deletion.",
+          message: 'An error occurred while marking the document for deletion.',
         });
         return;
       }
       res.status(200).send('Document successfully marked for deletion.');
     });
   });
+};
 
 }
 
