@@ -9,7 +9,7 @@ backend-build:
     refs:
       - main
     changes:
-      - backend/
+      - backend/*
   tags:
     - node
   script:
@@ -25,7 +25,7 @@ frontend-build:
     refs:
       - main
     changes:
-      - frontend/
+      - frontend/*
   tags:
    - vue
   script:
