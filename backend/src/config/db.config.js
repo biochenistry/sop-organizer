@@ -6,5 +6,5 @@ export default {
   USER: process.env.DB_USER || 'sop_admin',
   PASSWORD: process.env.DB_PASSWORD || 'sop123!',
   DB: process.env.DB_NAME || 'sop_database',
-  PORT: process.env.DB_PORT || 3306
+  PORT: process.env.DB_PORT || 3306,
 };

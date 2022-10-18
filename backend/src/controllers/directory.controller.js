@@ -52,7 +52,7 @@ const getSopsIdsByDirectoryId = (req, res) => {
   Directory.getSopsIdsByDirectoryId(req.params.id, (err, dir) => {
     if (err) {
       res.status(500).send({
-        message: "An error occurred while fetching the directory.",
+        message: 'An error occurred while fetching the directory.',
       });
       return;
     }
