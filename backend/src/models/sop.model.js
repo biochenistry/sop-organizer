@@ -59,7 +59,7 @@ SOP.create = (newSop, directoryName, resultCallback) => {
         sql.query(
           'INSERT INTO directory_sop SET ?',
           directorySopObject,
-          (err, res3) => {
+          (err) => {
             if (err) {
               if (err.sqlMessage) {
                 console.log(`SQL Error: ${err.sqlMessage}`);
@@ -77,7 +77,7 @@ SOP.create = (newSop, directoryName, resultCallback) => {
 };
 
 SOP.update = (id, updated_sop, resultCallback) => {
-  sql.query('UPDATE sops SET ? WHERE id = ?', [updated_sop, id], (err, res) => {
+  sql.query('UPDATE sops SET ? WHERE id = ?', [updated_sop, id], (err) => {
     if (err) {
       if (err.sqlMessage) {
         console.log(`SQL Error: ${err.sqlMessage}`);

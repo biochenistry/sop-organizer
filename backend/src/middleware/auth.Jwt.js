@@ -30,7 +30,7 @@ const isAdmin = async (req, res, next) => {
       function (err, result) {
         if (err) throw err;
         req.requester = result[0].privilege;
-        if ((req.requester = '<Buffer 01>')) {
+        if (req.requester == '<Buffer 01>') {
           return next();
         } else {
           return res.status(403).send({

@@ -77,7 +77,7 @@ const changePermission = (req, res) => {
             `UPDATE users
         SET privilege = ${req.body.newprivilege}
         WHERE email = '${req.body.email}';`,
-            function (err, result) {
+            function (err) {
               if (err) throw err;
               return res.send('user privilege updated.');
             }
@@ -121,7 +121,7 @@ const register = (req, res) => {
           connection.query(
             `INSERT INTO users (id, name, email, password, privilege)
            VALUES (0, '${req.body.name}', '${email}', '${pwd}', 0)`,
-            function (err, result) {
+            function (err) {
               if (err) throw err;
               return res.send('record inserted.');
             }

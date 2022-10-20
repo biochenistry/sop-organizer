@@ -1,6 +1,5 @@
 import auth from '../controllers/auth.controller.js';
 import { Router } from 'express';
-import bodyParser from 'body-parser';
 import jwt from '../middleware/auth.Jwt.js';
 
 const router = Router();

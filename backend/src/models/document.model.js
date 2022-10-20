@@ -1,7 +1,6 @@
 import sql from './db.js';
 import fs from 'fs';
 import { exec } from 'child_process';
-import { relative } from 'path';
 
 const STORAGE_DIR = `${process.env.PROJECT_PATH}/sop-files/`;
 const PANDOC_DIR = `${process.env.PANDOC_PATH}`;
