@@ -44,12 +44,10 @@ const uploadNew = (req, res) => {
     // 2. Put document into database
     Document.uploadNew(documentObject, file, directoryName, (err, data2) => {
       if (err)
-        return res
-          .status(500)
-          .send({
-            message:
-              'An error occurred finding the linked SOP. Please retry upload.',
-          });
+        return res.status(500).send({
+          message:
+            'An error occurred finding the linked SOP. Please retry upload.',
+        });
 
       SOP.update(
         data.insertId,
@@ -227,7 +225,7 @@ const markForDeletion = (req, res) => {
     }
     req.userId = decoded.id;
 
-    Document.markForDeletion(req.params.id, req.userId, (err, document) => {
+    Document.markForDeletion(req.params.id, req.userId, (err) => {
       if (err) {
         res.status(500).send({
           message: 'An error occurred while marking the document for deletion.',
