@@ -9,8 +9,8 @@
         <v-card-subtitle>
           Original filename: {{ document.original_file_name }}
         </v-card-subtitle>
-        <v-card-subtitle v-if="document.marked_for_deletion_by_user_id" class="font-weight-bold">
-          Marked for deletion by user: {{ document.marked_for_deletion_by_user_id }}
+        <v-card-subtitle v-if="deleter" class="font-weight-bold">
+          Marked for deletion by user: {{ deleter.name }}
         </v-card-subtitle>
 
         <editor :file="file" :document="document" @delete-file="isShowingDeleteOverlay = true" />
@@ -58,6 +58,7 @@
 import { getDocument, getDocuments, markDeleteDocument, getDocumentsWithSopId } from '~/services/documents';
 import { getFile } from '~/services/files';
 import { getSOP } from '~/services/sops';
+import { getUser } from '~/services/users';
 
 export default {
   name: 'DocumentPage',
@@ -71,12 +72,15 @@ export default {
   },
   async asyncData({ params, error }) {
     const documentId = params.pathMatch;
-    let sop, document, file, selectedVersion, versions;
+    let sop, document, file, selectedVersion, versions, deleter;
 
     try {
       document = await getDocument(documentId);
       sop = await getSOP(document.sop_id);
       file = await getFile(document.location);
+      if (document.marked_for_deletion_by_user_id) {
+        deleter = await getUser(document.marked_for_deletion_by_user_id);
+      }
       versions = await getDocumentsWithSopId(sop.id);
       versions.map((doc_version) => {
         doc_version.version_number = "Version " + doc_version.version_number;
@@ -97,7 +101,8 @@ export default {
       document,
       file,
       versions,
-      selectedVersion
+      selectedVersion,
+      deleter
     };
   },
   methods: {
