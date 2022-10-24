@@ -10,9 +10,13 @@
     >
       <v-toolbar>
         <v-text-field
+          :id="search"
+          v-model="search"
           hide-details
           prepend-icon="mdi-magnify"
           single-line
+          clearable
+          placeholder="Search title"
         ></v-text-field>
       </v-toolbar>
       <div v-if="isLoading" class="text-center py-12">
@@ -23,8 +27,8 @@
           :width="7"
         ></v-progress-circular>
       </div>
-      <v-list v-else-if="directories.length">
-        <v-list-item v-for="(directory, i) in directories" :key="i" to="" router exact>
+      <v-list v-else-if="filteredList.length">
+        <v-list-item v-for="(directory, i) in filteredList" :key="i" to="" router exact>
           <v-list-item-content>
             <Upload :directory-name=directory.name :is-logged-in="isLoggedIn" @refresh="updateDocuments" />
             <v-list>
@@ -98,7 +102,7 @@
       @authenticationChange="checkAuthentication"
     ></login-modal>
     <RegisterModal v-if="showRegModal" @clearRegModal="showRegModal = false" />
-    <DirectoryModal v-if="showDirModal" @clearDirModal="showDirModal = false" />
+    <DirectoryModal v-if="showDirModal" @clearDirModal="showDirModal = false" @refresh="updateDocuments"/>
   </v-app>
 </template>
 
@@ -144,7 +148,8 @@ export default defineComponent({
       showDirModal: false,
       sops: [],
       isLoading: true,
-      directories: []
+      directories: [],
+      search: '',
     };
   },
   mounted() {
@@ -191,6 +196,16 @@ export default defineComponent({
       this.isLoggedIn = false;
     }
   },
+  computed: {
+    filteredList() {
+      if(this.search==null || this.search==""){
+        return this.directories;
+      }
+      return this.directories.map((dir) => ({...dir,
+  sops: dir.sops.filter((sops) => sops.name.toLowerCase().includes(this.search.toLowerCase()))
+}));
+    }
+  }
 });
 </script>
 
