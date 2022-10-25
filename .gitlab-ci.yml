@@ -29,7 +29,7 @@ frontend-build:
   tags:
    - vue
   script:
-    - authbind --deep status
+    - authbind --deep pm2 status
     - cd frontend
     - npm set-script prepare ''
     - npm install
