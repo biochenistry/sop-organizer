@@ -33,5 +33,5 @@ frontend-build:
     - cd frontend
     - npm set-script prepare ''
     - npm install
-    - npx authbind --deep pm2 delete "server_frontend" 2> /dev/null || true
-    - npx authbind --deep pm2 start npm --name "server_frontend" -- run start
+    - npx pm2 delete "server_frontend" 2> /dev/null || true
+    - npx pm2 start npm --name "server_frontend" -- run start -p 80
