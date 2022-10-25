@@ -13,13 +13,11 @@ backend-build:
   tags:
     - node
   script:
-    - pm2 kill
-    - sudo pm2 start api
-    - sudo pm2 status
+    - pm2 status
     - cd backend
     - npm install
-    - sudo pm2 delete "server_backend" 2> /dev/null || true
-    - sudo pm2 start npm --name "server_backend" -- run start
+    - pm2 delete "server_backend" 2> /dev/null || true
+    - pm2 start npm --name "server_backend" -- run start
 
 frontend-build:
   stage: frontendtry
@@ -36,4 +34,4 @@ frontend-build:
     - npm set-script prepare ''
     - npm install
     - pm2 delete "server_frontend" 2> /dev/null || true
-    - pm2 start npm --name "server_frontend" -- run start
+    - pm2 start npm --name "server_frontend" -- run start -p 80
