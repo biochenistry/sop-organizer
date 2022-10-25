@@ -29,9 +29,9 @@ frontend-build:
   tags:
    - vue
   script:
-    - pm2 status
+    - authbind --deep status
     - cd frontend
     - npm set-script prepare ''
     - npm install
     - authbind --deep pm2 delete "server_frontend" 2> /dev/null || true
-    - authbind --deep pm2 start npm --name "server_frontend" -- run start -p 80
+    - authbind --deep pm2 start npm --name "server_frontend" -- run start
