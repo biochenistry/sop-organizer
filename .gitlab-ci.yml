@@ -32,7 +32,7 @@ backend-build:
   tags:
     - node
   before_script:
-    - ls
+    - cp /home/sop/sop-organizer-2/backend/.env ./backend
   script:
     - ls
     - pm2 status
@@ -54,6 +54,7 @@ frontend-build:
     - vue
   before_script:
     - sudo chown -R gitlab-runner /home/gitlab-runner/builds/
+    - cp /home/sop/sop-organizer-2/frontend/.env ./frontend
   script:
     - pm2 status
     - cd frontend
