@@ -19,7 +19,7 @@ backend-build:
 frontend-build:
   stage: frontendtry
   variables: 
-    GIT_STRATEGY: none
+    GIT_STRATEGY: clone
   only:
     refs:
       - main
