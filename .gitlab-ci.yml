@@ -29,10 +29,10 @@ frontend-build:
   tags:
    - vue
   script:
-    - npx pm2 status
+    - pm2 status
     - cd frontend
-    - npm set-script prepare ''
-    - npm install
-    - npm run build
-    - npx pm2 delete "server_frontend" 2> /dev/null || true
-    - npx pm2 start npm --name "server_frontend" -- run start
+    - sudo npm set-script prepare ''
+    - sudo npm install
+    - sudo npm run build
+    - pm2 delete "server_frontend" 2> /dev/null || true
+    - pm2 start
