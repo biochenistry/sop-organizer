@@ -14,7 +14,7 @@ cleanup:
   variables:
     GIT_STRATEGY: none
   tags:
-    - node, vue
+    - node
   script:
     - sudo rm -rf *
     - sudo rm -rf .git
