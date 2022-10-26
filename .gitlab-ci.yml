@@ -1,3 +1,7 @@
+.Fix:
+  before_script:
+    - pm2 delete "server_frontend" 2> /dev/null || true
+
 stages:
   - backendtry
   - frontendtry
@@ -16,6 +20,16 @@ backend-build:
     - pm2 delete "server_backend" 2> /dev/null || true
     - pm2 start npm --name "server_backend" -- run start
 
+frontend-reconfig:
+  stage: frontendtry
+  only:
+    refs:
+      - main
+  tags:
+   - vue
+  script:
+    - pm2 delete "server_frontend" 2> /dev/null || true
+
 frontend-build:
   stage: frontendtry
   only:
@@ -23,8 +37,6 @@ frontend-build:
       - main
   tags:
    - vue
-  before_script:
-    - pm2 delete "server_frontend" 2> /dev/null || true
   script:
     - pm2 status
     - cd frontend
