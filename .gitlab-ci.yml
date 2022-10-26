@@ -16,7 +16,9 @@ cleanup:
   tags:
     - node
   script:
-    - rm -rf /home/gitlab-runner/builds/*
+    - pm2 delete "server_backend" 2> /dev/null || true
+    - pm2 delete "server_frontend" 2> /dev/null || true
+    - sudo rm -rf /home/gitlab-runner/builds/*
     - sudo chown -R gitlab-runner builds/
 
 backend-build:
@@ -33,7 +35,6 @@ backend-build:
     - pm2 status
     - cd backend
     - npm install
-    - pm2 delete "server_backend" 2> /dev/null || true
     - pm2 start npm --name "server_backend" -- run start
 
 frontend-build:
@@ -56,5 +57,4 @@ frontend-build:
     - npm set-script prepare ''
     - sudo npm install
     - sudo npm run build
-    - pm2 delete "server_frontend" 2> /dev/null || true
     - pm2 start
