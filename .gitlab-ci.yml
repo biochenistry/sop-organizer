@@ -2,6 +2,18 @@ stages:
   - backendtry
   - frontendtry
 
+cleanup:
+  stage: backendtry
+  variables:
+    GIT_STRATEGY: none
+  tags:
+    - node
+  script:
+    - sudo rm -rf *
+    - sudo rm -rf .git
+    - cd ~
+    - sudo chown -R gitlab-runner builds/
+
 backend-build:
   stage: backendtry
   only:
@@ -17,16 +29,6 @@ backend-build:
     - npm install
     - pm2 delete "server_backend" 2> /dev/null || true
     - pm2 start npm --name "server_backend" -- run start
-
-cleanup-frontend:
-  stage: frontendtry
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - sudo rm -rf *
-    - sudo rm -rf .git
-    - cd ~
-    - sudo chown -R gitlab-runner builds/
 
 frontend-build:
   stage: frontendtry
