@@ -19,7 +19,7 @@ cleanup:
     - pm2 delete "server_backend" 2> /dev/null || true
     - pm2 delete "server_frontend" 2> /dev/null || true
     - sudo rm -rf /home/gitlab-runner/builds/*
-    - sudo chown -R gitlab-runner builds/
+    - sudo chown -R gitlab-runner /home/gitlab-runner/builds/
 
 backend-build:
   stage: backendtry
