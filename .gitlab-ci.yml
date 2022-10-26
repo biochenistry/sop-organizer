@@ -18,6 +18,16 @@ backend-build:
     - pm2 delete "server_backend" 2> /dev/null || true
     - pm2 start npm --name "server_backend" -- run start
 
+cleanup-frontend:
+  stage: frontendtry
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - sudo rm -rf *
+    - sudo rm -rf .git
+    - cd ~
+    - sudo chown -R gitlab-runner builds/
+
 frontend-build:
   stage: frontendtry
   variables: 
