@@ -6,11 +6,11 @@ stages:
 cleanup:
   stage: cleanup_stage
   only:
-  refs:
-    - main
-  changes:
-    - backend/*
-    - frontend/*
+    refs:
+      - main
+    changes:
+      - backend/*
+      - frontend/*
   variables:
     GIT_STRATEGY: none
   tags:
