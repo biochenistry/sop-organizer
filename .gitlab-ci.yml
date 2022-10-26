@@ -16,9 +16,7 @@ cleanup:
   tags:
     - node
   script:
-    - sudo rm -rf *
-    - sudo rm -rf .git
-    - cd ~
+    - rm -rf /home/gitlab-runner/builds/*
     - sudo chown -R gitlab-runner builds/
 
 backend-build:
