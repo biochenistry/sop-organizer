@@ -44,7 +44,7 @@ const uploadNew = (req, res) => {
     // 2. Put document into database
     Document.uploadNew(documentObject, file, directoryName, (err, data2) => {
       if (err)
-        return res.status(500).send({
+        return res.status(501).send({
           message:
             'An error occurred finding the linked SOP. Please retry upload.',
         });
