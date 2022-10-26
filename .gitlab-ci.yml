@@ -5,10 +5,16 @@ stages:
 
 cleanup:
   stage: cleanup_stage
+  only:
+  refs:
+    - main
+  changes:
+    - backend/*
+    - frontend/*
   variables:
     GIT_STRATEGY: none
   tags:
-    - node
+    - node, vue
   script:
     - sudo rm -rf *
     - sudo rm -rf .git
@@ -20,6 +26,9 @@ backend-build:
   only:
     refs:
       - main
+    changes:
+      - backend/*
+      - frontend/*
   tags:
     - node
   script:
@@ -36,6 +45,9 @@ frontend-build:
   only:
     refs:
       - main
+    changes:
+      - backend/*
+      - frontend/*
   tags:
     - vue
   script:
