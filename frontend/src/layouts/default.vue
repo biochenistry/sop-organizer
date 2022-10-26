@@ -28,24 +28,40 @@
         ></v-progress-circular>
       </div>
       <v-list v-else-if="filteredList.length">
-        <v-list-item v-for="(directory, i) in filteredList" :key="i" to="" router exact>
+        <v-list-item
+          v-for="(directory, i) in filteredList"
+          :key="i"
+          to=""
+          router
+          exact
+        >
           <v-list-item-content>
-            <Upload :directory-name=directory.name :is-logged-in="isLoggedIn" @refresh="updateDocuments" />
+            <Upload
+              :directory-name="directory.name"
+              :is-logged-in="isLoggedIn"
+              @refresh="updateDocuments"
+            />
             <v-list>
-              <v-list-item
-                v-for="(sop, j) in directory.sops"
-                :key="`${directory}-${sop.name}-${j}`"
-                :to="`/document/${sop.latest_version_document_id}`"
-                router  
-                exact
+              <draggable
+                v-model="directory.sops"
+                group="sops"
+                @change="handleChanges($event, directory.sops, directory)"
               >
-                <v-list-item-title
-                  class="pl-4"
-                  style="max-width: 100%; text-overflow: ellipsis"
+                <v-list-item
+                  v-for="(sop, j) in directory.sops"
+                  :key="`${directory}-${sop.name}-${j}`"
+                  :to="`/document/${sop.latest_version_document_id}`"
+                  router
+                  exact
                 >
-                <v-icon>mdi-file-document</v-icon> {{sop.name}}
-                </v-list-item-title>
-              </v-list-item>
+                  <v-list-item-title
+                    class="pl-4"
+                    style="max-width: 100%; text-overflow: ellipsis"
+                  >
+                    <v-icon>mdi-file-document</v-icon> {{ sop.name }}
+                  </v-list-item-title>
+                </v-list-item>
+              </draggable>
             </v-list>
           </v-list-item-content>
         </v-list-item>
@@ -67,9 +83,9 @@
           </v-btn>
         </v-list-item>
         <v-list-item v-if="isLoggedIn && isAdmin" class="mx-auto">
-          <v-btn @click="showDirModal = true" align-center>
+          <v-btn align-center @click="showDirModal = true">
             Create Directory
-          </v-btn>        
+          </v-btn>
         </v-list-item>
         <v-list-item class="mx-auto">
           <v-btn>
@@ -102,33 +118,46 @@
       @authenticationChange="checkAuthentication"
     ></login-modal>
     <RegisterModal v-if="showRegModal" @clearRegModal="showRegModal = false" />
-    <DirectoryModal v-if="showDirModal" @clearDirModal="showDirModal = false" @refresh="updateDocuments"/>
+    <DirectoryModal
+      v-if="showDirModal"
+      @clearDirModal="showDirModal = false"
+      @refresh="updateDocuments"
+    />
+    <DirectoryChangeModal
+      v-if="showDirectoryChangeModal"
+      @acceptChanges="acceptChanges"
+      @revertChanges="revertChanges"
+      @clearDirectoryChangeModal="showDirectoryChangeModal = false"
+    />
   </v-app>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import draggable from 'vuedraggable';
 import LoginModal from '@/components/LoginModal.vue';
 import RegisterModal from '@/components/RegisterModal.vue';
 import DirectoryModal from '@/components/DirectoryModal.vue';
+import DirectoryChangeModal from '@/components/DirectoryChangeModal.vue';
 import Upload from '@/components/Upload.vue';
 import { SOP, Directory } from '@/types';
 // import { getDocuments } from '@/services/documents';
 import { getSOP } from '~/services/sops';
-import { getSops } from '~/services/directories';
-import { getDirectories } from '~/services/directories';
+import { changeDirectory } from '~/services/sops';
+import { getSops , getDirectories } from '~/services/directories';
 
 interface State {
-  isSideBarVisible: boolean,
-  isLoggedIn: boolean,
-  isAdmin: boolean,
-  username?: String,
-  showRegModal: boolean,
-  showDirModal: boolean,
-  title: String,
-  sops: Array<SOP>
-  directories: Array<Directory>
-};
+  isSideBarVisible: boolean;
+  isLoggedIn: boolean;
+  isAdmin: boolean;
+  username?: String;
+  showRegModal: boolean;
+  showDirModal: boolean;
+  showDirectoryChangeModal: boolean;
+  title: String;
+  sops: Array<SOP>;
+  directories: Array<Directory>;
+}
 
 export default defineComponent({
   name: 'DefaultLayout',
@@ -137,6 +166,8 @@ export default defineComponent({
     RegisterModal,
     Upload,
     DirectoryModal,
+    draggable,
+    DirectoryChangeModal,
   },
   data() {
     return {
@@ -146,11 +177,25 @@ export default defineComponent({
       showRegModal: false,
       isLoggingIn: false,
       showDirModal: false,
-      sops: [],
+      showDirectoryChangeModal: false,
       isLoading: true,
       directories: [],
       search: '',
+      directoryChanges: [],
     };
+  },
+  computed: {
+    filteredList() {
+      if (this.search == null || this.search == '') {
+        return this.directories;
+      }
+      return this.directories.map((dir) => ({
+        ...dir,
+        sops: dir.sops.filter((sops) =>
+          sops.name.toLowerCase().includes(this.search.toLowerCase())
+        ),
+      }));
+    },
   },
   mounted() {
     this.updateDocuments();
@@ -162,26 +207,33 @@ export default defineComponent({
       this.isLoading = true;
       getDirectories()
         .then((directories) => {
-          directories.forEach( (directory, index) => {
-            directory['sops'] = [];
-            getSops(directory['id'])
+          directories.forEach((directory, index) => {
+            directory.sops = [];
+            getSops(directory.id)
               .then((sops) => {
-                  sops.forEach( (sop, sopIndex) => {
-                    getSOP(sop.sop_id)
-                      .then((sop) => {
-                        directory['sops'].push(sop);
-                        this.directories = directories;
-                      })
-                  })
+                sops.forEach((sop, sopIndex) => {
+                  getSOP(sop.sop_id).then((sop) => {
+                    directory.sops.push(sop);
+                    this.directories = directories;
+                  });
+                });
               })
-              .catch((err) => { 
-                console.log('Directory has no SOPs.'); 
+              .catch((err) => {
+                // No directories
+                this.isLoading = false;
                 this.directories = directories;
               })
-              .finally(() => {     
+              .finally(() => {
                 this.isLoading = false;
               });
           });
+        })
+        .catch((err) => {
+          console.log(err);
+          this.isLoading = false;
+        })
+        .finally(() => {
+          this.isLoading = false;
         });
     },
     checkAuthentication() {
@@ -194,18 +246,55 @@ export default defineComponent({
     logout() {
       window.localStorage.clear();
       this.isLoggedIn = false;
-    }
+    },
+    handleChanges(event, list, directory) {
+      this.directoryChanges.push({
+        event,
+        list,
+        directory,
+      });
+      this.showDirectoryChangeModal = true;
+    },
+    acceptChanges() {
+      let oldDirectory;
+      let newDirectory;
+      let sop_id;
+      this.directoryChanges.forEach(({ event, list, directory }) => {
+        event = JSON.parse(JSON.stringify(event));
+        if (event.removed) oldDirectory = JSON.parse(JSON.stringify(directory));
+        if (event.added) {
+          newDirectory = JSON.parse(JSON.stringify(directory));
+          sop_id = event.added.element.id;
+        }
+      });
+      changeDirectory(sop_id, oldDirectory, newDirectory);
+
+      this.directoryChanges = [];
+      this.showDirectoryChangeModal = false;
+    },
+    revertChanges() {
+      this.directoryChanges.forEach(({ event, list }) => {
+        if (event.added) {
+          const { newIndex } = event.added;
+          list.splice(newIndex, 1);
+        }
+
+        if (event.removed) {
+          const { oldIndex, element } = event.removed;
+          list.splice(oldIndex, 0, element);
+        }
+
+        if (event.moved) {
+          const { newIndex, oldIndex, element } = event.moved;
+          list[newIndex] = list[oldIndex];
+          list[oldIndex] = element;
+        }
+      });
+
+      this.directoryChanges = [];
+      this.showDirectoryChangeModal = false;
+    },
   },
-  computed: {
-    filteredList() {
-      if(this.search==null || this.search==""){
-        return this.directories;
-      }
-      return this.directories.map((dir) => ({...dir,
-  sops: dir.sops.filter((sops) => sops.name.toLowerCase().includes(this.search.toLowerCase()))
-}));
-    }
-  }
 });
 </script>
 

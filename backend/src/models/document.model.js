@@ -56,34 +56,20 @@ Document.uploadNew = (newDocument, file, directoryName, resultCallback) => {
           }
           sql.query(
             'UPDATE documents SET location = ? WHERE id = ?',
-            [`${relativePath}${newFileName}`, res.insertId],
+            [`${relativePath}`, res.insertId],
             (err) => {
-              // (err, res) => {
               if (err) {
                 console.log('Error: ', err);
                 resultCallback(err, null);
                 return;
               }
+              console.log('Database received a new document: ', {
+                id: res.insertId,
+                ...newDocument,
+              });
+              resultCallback(null, { id: res.insertId, ...newDocument });
             }
           );
-          sql.query(
-            'UPDATE documents SET location = ? WHERE id = ?',
-            [`${relativePath}${newFileName}`, res.insertId],
-            (err) => {
-              // (err, res) => {
-              if (err) {
-                console.log('Error: ', err);
-                resultCallback(err, null);
-                return;
-              }
-            }
-          );
-
-          console.log('Database received a new document: ', {
-            id: res.insertId,
-            ...newDocument,
-          });
-          resultCallback(null, { id: res.insertId, ...newDocument });
         }
       );
     });
@@ -139,7 +125,7 @@ Document.updateExisting = (
             }
             sql.query(
               'UPDATE documents SET location = ? WHERE id = ?',
-              [`${relativePath}${newFileName}`, res.insertId],
+              [`${relativePath}`, res.insertId],
               (err) => {
                 if (err) {
                   console.log('Error: ', err);
@@ -155,7 +141,7 @@ Document.updateExisting = (
                         resultCallback(err, null);
                         return;
                       } else {
-                        newDocument.location = `${relativePath}${newFileName}`;
+                        newDocument.location = `${relativePath}`;
                         console.log('Database received a new document: ', {
                           id: res.insertId,
                           ...newDocument,
@@ -200,7 +186,7 @@ Document.save = (newDocument, file, directoryName, resultCallback) => {
       else {
         sql.query(
           'UPDATE documents SET location = ? WHERE id = ?',
-          [`${relativePath}${newFileName}`, res.insertId],
+          [`${relativePath}`, res.insertId],
           (err) => {
             if (err) {
               console.log('Error: ', err);
@@ -216,7 +202,7 @@ Document.save = (newDocument, file, directoryName, resultCallback) => {
                     resultCallback(err, null);
                     return;
                   } else {
-                    newDocument.location = `${relativePath}${newFileName}`;
+                    newDocument.location = `${relativePath}`;
                     console.log('Database received a new document: ', {
                       id: res.insertId,
                       ...newDocument,

@@ -2,15 +2,18 @@
   <div>
     <v-container>
       <v-row align-v="center">
-        <v-col cols=1 align="left" align-self="center"><v-icon>mdi-folder-open</v-icon></v-col>
-        <v-col cols=1 align="left" align-self="center" > {{directoryName}} </v-col>
+        <v-col cols="1" align="left" align-self="center"
+          ><v-icon>mdi-folder-open</v-icon></v-col
+        >
+        <v-col cols="1" align="left" align-self="center">
+          {{ directoryName }}
+        </v-col>
         <v-col v-if="isLoggedIn" align="right" align-self="center">
           <v-btn small @click="selectFile(directoryName)">
             <v-icon>mdi-plus</v-icon>
           </v-btn>
         </v-col>
       </v-row>
-      
     </v-container>
     <input
       ref="uploadFile"
@@ -18,27 +21,6 @@
       hidden
       @change="rememberFileSelection"
     />
-    <v-overlay :value="isOverlayVisible">
-      <v-progress-circular
-        v-if="isLoading"
-        indeterminate
-        :size="70"
-        :width="7"
-      ></v-progress-circular>
-      <v-card v-else class="pa-4">
-        <v-text-field
-          v-model="editorId"
-          type="number"
-          label="User ID"
-        ></v-text-field>
-        <v-text-field
-          v-model="sopId"
-          type="number"
-          label="SOP ID"
-        ></v-text-field>
-        <v-btn color="primary" @click="uploadFile">Continue</v-btn>
-      </v-card>
-    </v-overlay>
   </div>
 </template>
 
@@ -50,23 +32,20 @@ export default defineComponent({
   name: 'UploadButton',
   props: {
     directoryName: String,
-    isLoggedIn: Boolean
+    isLoggedIn: Boolean,
   },
   data: () => ({
-    isOverlayVisible: false,
     fileData: undefined,
     sopId: undefined,
-    selectedFile: undefined,
     isSelecting: false,
     isLoading: false,
     editorId: undefined,
-    selectedDirectoryName: undefined
+    selectedDirectoryName: undefined,
   }),
   methods: {
     // Credit: https://ourcodeworld.com/articles/read/1424/how-to-use-a-button-as-a-file-uploader-with-vuetify-in-vuejs
     selectFile(selectedDirectoryName) {
       this.selectedDirectoryName = selectedDirectoryName;
-      console.log(selectedDirectoryName);
       this.isSelecting = true;
       window.addEventListener(
         'focus',
@@ -78,16 +57,13 @@ export default defineComponent({
       this.$refs.uploadFile.click();
     },
     rememberFileSelection(event) {
-      this.selectedFile = event.target.files[0];
-
       this.fileData = new FormData();
-      this.fileData.append('file', this.selectedFile);
-      this.isOverlayVisible = true;
+      this.fileData.append('file', event.target.files[0]);
+      this.uploadFile();
     },
     uploadFile() {
       this.fileData.append('directory_name', this.selectedDirectoryName);
-      this.fileData.append('editor_id', 1); // placeholder for now 
-
+      this.fileData.append('editor_id', 1); // placeholder for now
       this.isLoading = true;
 
       uploadNew(this.fileData)
@@ -97,7 +73,6 @@ export default defineComponent({
         })
         .finally(() => {
           this.isLoading = false;
-          this.isOverlayVisible = false;
           this.$emit('refresh');
         });
     },

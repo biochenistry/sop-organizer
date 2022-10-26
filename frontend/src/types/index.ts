@@ -9,9 +9,9 @@ export interface Document {
 }
 
 export interface Directory {
-    id?: Number,
-    name: String,
-    description?: String,
+  id?: Number;
+  name: String;
+  description?: String;
 }
 
 export interface SOP {

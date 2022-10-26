@@ -57,6 +57,6 @@ export default {
   server: {
     port: process.env.NUXT_ENV_PORT || '80', // requires sudo to start
     host: '0.0.0.0',
-    timing: false
-  }
+    timing: false,
+  },
 };

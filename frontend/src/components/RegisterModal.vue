@@ -25,8 +25,17 @@
           type="password"
           @keyup.enter.native="submit()"
         ></v-text-field>
-        <v-card-subtitle v-if="errorMessage"><strong>An error occurred.</strong> Error:<br />{{errorMessage}}</v-card-subtitle>
-        <v-btn v-if="!isLoading" color="primary" class="float-right" :disabled="!formIsValid" @click="register"
+        <v-card-subtitle v-if="errorMessage"
+          ><strong>An error occurred.</strong> Error:<br />{{
+            errorMessage
+          }}</v-card-subtitle
+        >
+        <v-btn
+          v-if="!isLoading"
+          color="primary"
+          class="float-right"
+          :disabled="!formIsValid"
+          @click="register"
           >Register</v-btn
         >
         <v-progress-circular
@@ -39,9 +48,7 @@
         ></v-progress-circular>
       </v-responsive>
       <v-responsive v-else>
-        <v-card-subtitle>
-          Account successfully registered.
-        </v-card-subtitle>
+        <v-card-subtitle> Account successfully registered. </v-card-subtitle>
         <v-card-text>
           Please sign in with your newly created account
         </v-card-text>
@@ -67,33 +74,42 @@ export default defineComponent({
       isShowingSuccessMessage: false,
     };
   },
+  computed: {
+    formIsValid() {
+      // TODO - improve this
+      return (
+        this.name !== '' &&
+        this.email !== '' &&
+        this.password !== '' &&
+        this.password === this.cpassword
+      );
+    },
+  },
   methods: {
     closeModal() {
       this.$emit('clearRegModal');
     },
     register() {
       this.isLoading = true;
-      registerUser({ name: this.name, email: this.email, password: this.password })
-      .then(() => {
-        this.isShowingSuccessMessage = true;
-        setTimeout(() => {
-          this.$emit('clearRegModal');
-        }, 7500);
+      registerUser({
+        name: this.name,
+        email: this.email,
+        password: this.password,
       })
-      .catch((err) => {
-        console.log('error', err);
-        this.errorMessage = err.message;
-      })
-      .finally(() => {
-        this.isLoading = false;
-      })
+        .then(() => {
+          this.isShowingSuccessMessage = true;
+          setTimeout(() => {
+            this.$emit('clearRegModal');
+          }, 7500);
+        })
+        .catch((err) => {
+          console.log('error', err);
+          this.errorMessage = err.message;
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
     },
   },
-  computed: {
-    formIsValid() {
-      // TODO - improve this
-      return this.name !== '' && this.email !== '' && this.password !== '' && this.password === this.cpassword;
-    },
-  }
 });
 </script>

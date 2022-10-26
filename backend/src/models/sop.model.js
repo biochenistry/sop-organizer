@@ -1,5 +1,6 @@
 import sql from './db.js';
-import fs from 'fs';
+// import fs from 'fs';
+import fs from 'fs-extra';
 
 const STORAGE_DIR = `${process.env.PROJECT_PATH}/sop-files/`;
 
@@ -140,4 +141,48 @@ SOP.getByName = (name, resultCallback) => {
   });
 };
 
+SOP.changeDirectory = (sop_id, oldDirectory, newDirectory, resultCallback) => {
+  console.log(sop_id);
+  console.log(oldDirectory);
+  console.log(newDirectory);
+  const oldPath = `${STORAGE_DIR}/${oldDirectory.name}/${sop_id}/`;
+  const newPath = `${STORAGE_DIR}/${newDirectory.name}/${sop_id}/`;
+  const relativeNewPath = `${newDirectory.name}/${sop_id}/`;
+
+  console.log(oldPath);
+  console.log(newPath);
+  fs.move(oldPath, newPath, { overwrite: true }, (err) => {
+    if (err) {
+      console.log('Error changing SOP directory');
+      resultCallback(err);
+    }
+
+    sql.query(
+      'UPDATE directory_sop SET directory_id = ? WHERE sop_id = ?',
+      [newDirectory.id, sop_id],
+      (err) => {
+        if (err) {
+          if (err.sqlMessage) {
+            console.log(`SQL Error: ${err.sqlMessage}`);
+          } else console.log(`Error: ${err.message}`);
+          resultCallback(err);
+          return;
+        }
+        sql.query(
+          'UPDATE documents SET location = ? WHERE sop_id = ?',
+          [relativeNewPath, sop_id],
+          (err) => {
+            if (err) {
+              if (err.sqlMessage) {
+                console.log(`SQL Error: ${err.sqlMessage}`);
+              } else console.log(`Error: ${err.message}`);
+              resultCallback(err);
+              return;
+            }
+          }
+        );
+      }
+    );
+  });
+};
 export default SOP;
