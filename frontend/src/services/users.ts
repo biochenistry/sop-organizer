@@ -9,4 +9,4 @@ export async function getUser(id): Promise<User> {
   }
   const user: User = await res.json();
   return user;
-};
+}

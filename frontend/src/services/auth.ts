@@ -7,19 +7,19 @@ export async function registerUser(credentials): Promise<void> {
   const res = await fetch(`${BASE_URL}/auth/register`, {
     method: 'POST',
     body: JSON.stringify(credentials),
-    headers: {'Content-Type': 'application/json'},
+    headers: { 'Content-Type': 'application/json' },
   });
   if (!res.ok) {
     throw new Error(res.statusText);
   }
-};
+}
 
 export async function login(credentials): Promise<void> {
-    const res = await fetch(`${BASE_URL}/auth/signin`, {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-      headers: {'Content-Type': 'application/json'},
-    });
+  const res = await fetch(`${BASE_URL}/auth/signin`, {
+    method: 'POST',
+    body: JSON.stringify(credentials),
+    headers: { 'Content-Type': 'application/json' },
+  });
   if (!res.ok) {
     throw new Error(res.statusText);
   }
@@ -30,5 +30,5 @@ export async function login(credentials): Promise<void> {
   window.localStorage.setItem('email', user.email);
   window.localStorage.setItem('isAdmin', `${user.privilege.data[0] === 1}`);
 
-  return;
-};
+  
+}

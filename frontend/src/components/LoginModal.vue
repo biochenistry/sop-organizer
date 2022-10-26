@@ -18,8 +18,19 @@
           type="password"
           @keyup.enter.native="submit()"
         ></v-text-field>
-        <v-card-subtitle v-if="errorMessage"><strong>An error occurred.</strong> Error:<br />{{errorMessage}}</v-card-subtitle>
-        <v-btn v-if="!isLoading" color="primary" class="float-right" :disabled="!formIsValid" @click="submit()">Login</v-btn>
+        <v-card-subtitle v-if="errorMessage"
+          ><strong>An error occurred.</strong> Error:<br />{{
+            errorMessage
+          }}</v-card-subtitle
+        >
+        <v-btn
+          v-if="!isLoading"
+          color="primary"
+          class="float-right"
+          :disabled="!formIsValid"
+          @click="submit()"
+          >Login</v-btn
+        >
         <v-progress-circular
           v-if="isLoading"
           indeterminate
@@ -47,6 +58,12 @@ export default defineComponent({
       isLoading: false,
     };
   },
+  computed: {
+    formIsValid() {
+      // TODO - improve this
+      return this.email !== '' && this.password !== '';
+    },
+  },
   methods: {
     emitCloseModal() {
       this.$emit('clearLoginModal');
@@ -63,15 +80,8 @@ export default defineComponent({
         })
         .finally(() => {
           this.isLoading = false;
-        })
-    }
-  },
-  computed: {
-    formIsValid() {
-      // TODO - improve this
-      return this.email !== '' && this.password !== '';
+        });
     },
-  }
+  },
 });
 </script>
-

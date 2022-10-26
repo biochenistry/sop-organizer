@@ -8,6 +8,7 @@ const SOPRoutes = (app) => {
   router.get('/:id', sops.getById);
   router.post('/', sops.create);
   router.patch('/:id', sops.update);
+  router.post('/changeDirectory', sops.changeDirectory);
 
   app.use('/sops', router);
 };

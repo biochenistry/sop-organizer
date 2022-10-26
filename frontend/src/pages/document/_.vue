@@ -4,7 +4,14 @@
       <v-card>
         <v-card-title>
           {{ sop.name }}<v-spacer></v-spacer>
-          <v-select @change="onVersionChange($event)" v-model="selectedVersion" :items="versions" item-text="version_number" return-object outlined ></v-select>
+          <v-select
+            v-model="selectedVersion"
+            :items="versions"
+            item-text="version_number"
+            return-object
+            outlined
+            @change="onVersionChange($event)"
+          ></v-select>
         </v-card-title>
         <v-card-subtitle>
           Original filename: {{ document.original_file_name }}
@@ -13,7 +20,11 @@
           Marked for deletion by user: {{ deleter.name }}
         </v-card-subtitle>
 
-        <editor :file="file" :document="document" @delete-file="isShowingDeleteOverlay = true" />
+        <editor
+          :file="file"
+          :document="document"
+          @delete-file="isShowingDeleteOverlay = true"
+        />
 
         <v-overlay :value="isShowingDeleteOverlay" :z-index="100">
           <v-card v-click-outside="closeDeleteModal" class="pa-4 d-" light>
@@ -26,17 +37,25 @@
               <v-card-title>Deletion Confirmation</v-card-title>
               <V-card-text>
                 <span class="text-body-1">
-                  Are you sure that you want to mark file <strong>{{document.original_file_name}}</strong> for deletion?
+                  Are you sure that you want to mark file
+                  <strong>{{ document.original_file_name }}</strong> for
+                  deletion?
                 </span>
                 <br />
                 <br />
                 <span class="text-body-2">
-                  An admin must approve your request before the file will be deleted.
+                  An admin must approve your request before the file will be
+                  deleted.
                 </span>
               </V-card-text>
               <v-card-actions class="justify-space-between">
                 <v-btn @click="closeDeleteModal">Cancel</v-btn>
-                <v-btn v-if="!isAwaitingDeletionCall" color="primary" @click="markDocForDeletion">Mark for deletion</v-btn>
+                <v-btn
+                  v-if="!isAwaitingDeletionCall"
+                  color="primary"
+                  @click="markDocForDeletion"
+                  >Mark for deletion</v-btn
+                >
                 <v-progress-circular
                   v-if="isAwaitingDeletionCall"
                   indeterminate
@@ -55,21 +74,18 @@
 </template>
 
 <script lang="ts">
-import { getDocument, getDocuments, markDeleteDocument, getDocumentsWithSopId } from '~/services/documents';
+import {
+  getDocument,
+  getDocuments,
+  markDeleteDocument,
+  getDocumentsWithSopId,
+} from '~/services/documents';
 import { getFile } from '~/services/files';
 import { getSOP } from '~/services/sops';
 import { getUser } from '~/services/users';
 
 export default {
   name: 'DocumentPage',
-  data() {
-    return {
-      isShowingDeleteOverlay: false,
-      isAwaitingDeletionCall: false,
-      versions: [],
-      selectedVersion: {}
-    }
-  },
   async asyncData({ params, error }) {
     const documentId = params.pathMatch;
     let sop, document, file, selectedVersion, versions, deleter;
@@ -77,16 +93,19 @@ export default {
     try {
       document = await getDocument(documentId);
       sop = await getSOP(document.sop_id);
-      file = await getFile(document.location);
+      file = await getFile(
+        `${document.location}${document.version_number}.html`
+      );
       if (document.marked_for_deletion_by_user_id) {
         deleter = await getUser(document.marked_for_deletion_by_user_id);
       }
       versions = await getDocumentsWithSopId(sop.id);
       versions.map((doc_version) => {
-        doc_version.version_number = "Version " + doc_version.version_number;
-      })
+        doc_version.version_number = 'Version ' + doc_version.version_number;
+      });
       selectedVersion = document;
-      selectedVersion.version_number = "Version " + selectedVersion.version_number;
+      selectedVersion.version_number =
+        'Version ' + selectedVersion.version_number;
     } catch (err) {
       error({
         statusCode: 500,
@@ -102,7 +121,20 @@ export default {
       file,
       versions,
       selectedVersion,
-      deleter
+      deleter,
+    };
+  },
+  data() {
+    return {
+      isShowingDeleteOverlay: false,
+      isAwaitingDeletionCall: false,
+      versions: [],
+      selectedVersion: {},
+    };
+  },
+  head() {
+    return {
+      title: `${this.sop?.name} - Version ${this.document?.version_number}`,
     };
   },
   methods: {
@@ -112,29 +144,25 @@ export default {
     markDocForDeletion() {
       this.isAwaitingDeletionCall = true;
       markDeleteDocument(this.documentId)
-      .then(() => {
-        this.$nuxt.refresh(); // refresh the component (and the data)
-        this.closeDeleteModal();
-      })
-      .catch((err) => {
-        this.error({
-          statusCode: 500,
-          message: 'Something went wrong while marking the document for deletion',
-          error: err,
+        .then(() => {
+          this.$nuxt.refresh(); // refresh the component (and the data)
+          this.closeDeleteModal();
+        })
+        .catch((err) => {
+          this.error({
+            statusCode: 500,
+            message:
+              'Something went wrong while marking the document for deletion',
+            error: err,
+          });
+        })
+        .finally(() => {
+          this.isAwaitingDeletionCall = false;
         });
-      })
-      .finally(() => {
-        this.isAwaitingDeletionCall = false;
-      });
     },
     onVersionChange(event) {
       this.$router.push(`/document/${event.id}`);
-    }
-  },
-  head() {
-    return {
-      title: `${this.sop?.name} - Version ${this.document?.version_number}`,
-    };
+    },
   },
 };
 </script>

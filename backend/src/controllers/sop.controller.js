@@ -103,6 +103,25 @@ const getById = (req, res) => {
   });
 };
 
+const changeDirectory = (req, res) => {
+  console.log(req.body);
+  SOP.changeDirectory(
+    req.body.sop_id,
+    req.body.oldDirectory,
+    req.body.newDirectory,
+    (err) => {
+      if (err) {
+        res.status(500).send({
+          message: 'An error occurred while changing the SOPs directory.',
+        });
+        return;
+      } else {
+        res.sendStatus(201);
+      }
+    }
+  );
+};
+
 // const getByName = (req, res) => {
 //   SOP.getByName(req.params.name, (err, sop) => {
 //     if (err) {
@@ -131,4 +150,4 @@ const getById = (req, res) => {
 //   });
 // };
 
-export default { create, getAll, getById, update };
+export default { create, getAll, getById, update, changeDirectory };

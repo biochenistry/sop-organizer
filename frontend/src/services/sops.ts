@@ -1,4 +1,4 @@
-import { SOP } from '../types/index';
+import { Directory, SOP } from '../types/index';
 
 const BASE_URL = process.env.NUXT_ENV_API_URL;
 
@@ -26,6 +26,30 @@ export async function createSOP(sop: SOP): Promise<void> {
   const res = await fetch(`${BASE_URL}/sops/`, {
     method: 'POST',
     body: JSON.stringify(sop),
+  });
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+}
+
+export async function changeDirectory(
+  sop_id: Number,
+  oldDirectory: Directory,
+  newDirectory: Directory
+): Promise<void> {
+  const body = {
+    sop_id,
+    oldDirectory,
+    newDirectory,
+  };
+  console.log(`Body: ${body}`);
+  const res = await fetch(`${BASE_URL}/sops/changeDirectory`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     throw new Error(res.statusText);

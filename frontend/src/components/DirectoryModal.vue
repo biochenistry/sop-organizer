@@ -40,15 +40,15 @@ export default defineComponent({
     },
 
     validatateDirectory() {
-      var regex = /^[a-zA-Z0-9-]*$/
+      const regex = /^[a-zA-Z0-9-]*$/;
       return regex.test(this.name);
     },
 
     addDirectory() {
       if (!this.name) return;
-      if(!this.validatateDirectory()){
-        this.errors.push("No Special Characters in Directory Name.");
-        console.log("No Special Characters in Directory Name.");
+      if (!this.validatateDirectory()) {
+        this.errors.push('No Special Characters in Directory Name.');
+        console.log('No Special Characters in Directory Name.');
         return;
       }
 
