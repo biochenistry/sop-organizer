@@ -7,6 +7,9 @@ backend-build:
   only:
     refs:
       - main
+  before_script:
+    - chmod +x ./frontend/.nuxt
+    - chmod +x ./frontend/node_modules
   tags:
     - node
   script:
