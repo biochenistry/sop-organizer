@@ -1,6 +1,6 @@
 import sql from './db.js';
 import fs from 'fs';
-// import fs from 'fs-extra';
+import fsExtra from 'fs-extra';
 
 const STORAGE_DIR = `${process.env.PROJECT_PATH}/sop-files`;
 
@@ -151,7 +151,7 @@ SOP.changeDirectory = (sop_id, oldDirectory, newDirectory, resultCallback) => {
 
   console.log(oldPath);
   console.log(newPath);
-  fs.move(oldPath, newPath, { overwrite: true }, (err) => {
+  fsExtra.move(oldPath, newPath, { overwrite: true }, (err) => {
     if (err) {
       console.log('Error changing SOP directory');
       resultCallback(err);
