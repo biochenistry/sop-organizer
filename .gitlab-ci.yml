@@ -32,13 +32,15 @@ backend-build:
   tags:
     - node
   before_script:
+    - pm2 delete "server_backend" 2> /dev/null || true
     - cp /home/sop/sop-organizer-2/backend/.env ./backend
+    - cp /home/sop/sop-organizer-2/frontend/.env ./frontend
   script:
     - ls
     - pm2 status
     - cd backend
     - npm install
-    - pm2 start npm --name "server_backend" -- run start
+    - pm2 --name "server_backend" start npm -- start
 
 frontend-build:
   stage: frontendtry
@@ -54,6 +56,8 @@ frontend-build:
     - vue
   before_script:
     - sudo chown -R gitlab-runner /home/gitlab-runner/builds/
+    - pm2 delete "server_frontend" 2> /dev/null || true
+    - cp /home/sop/sop-organizer-2/backend/.env ./backend
     - cp /home/sop/sop-organizer-2/frontend/.env ./frontend
   script:
     - pm2 status
