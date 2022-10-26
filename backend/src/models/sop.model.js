@@ -1,8 +1,8 @@
 import sql from './db.js';
-// import fs from 'fs';
-import fs from 'fs-extra';
+import fs from 'fs';
+// import fs from 'fs-extra';
 
-const STORAGE_DIR = `${process.env.PROJECT_PATH}/sop-files/`;
+const STORAGE_DIR = `${process.env.PROJECT_PATH}/sop-files`;
 
 const SOP = function (sop) {
   this.name = sop.name;
