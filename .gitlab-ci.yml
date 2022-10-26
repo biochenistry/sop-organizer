@@ -1,7 +1,3 @@
-.Fix:
-  before_script:
-    - pm2 delete "server_frontend" 2> /dev/null || true
-
 stages:
   - backendtry
   - frontendtry
@@ -20,18 +16,10 @@ backend-build:
     - pm2 delete "server_backend" 2> /dev/null || true
     - pm2 start npm --name "server_backend" -- run start
 
-frontend-reconfig:
-  stage: frontendtry
-  only:
-    refs:
-      - main
-  tags:
-   - vue
-  script:
-    - pm2 delete "server_frontend" 2> /dev/null || true
-
 frontend-build:
   stage: frontendtry
+  variables: 
+    GIT_STRATEGY: none
   only:
     refs:
       - main
@@ -43,4 +31,5 @@ frontend-build:
     - sudo npm set-script prepare ''
     - sudo npm install
     - sudo npm run build
+    - pm2 delete "server_frontend" 2> /dev/null || true
     - pm2 start
