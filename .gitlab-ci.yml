@@ -23,11 +23,12 @@ frontend-build:
       - main
   tags:
    - vue
+  before_script:
+    - pm2 delete "server_frontend" 2> /dev/null || true
   script:
     - pm2 status
     - cd frontend
     - sudo npm set-script prepare ''
     - sudo npm install
     - sudo npm run build
-    - pm2 delete "server_frontend" 2> /dev/null || true
     - pm2 start
