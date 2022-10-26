@@ -38,8 +38,6 @@ frontend-build:
       - main
   tags:
     - vue
-  before_script: 
-    - sudo chown -R gitlab-runner builds/
   script:
     - pm2 status
     - cd frontend
