@@ -1,9 +1,10 @@
 stages:
+  - cleanup_stage
   - backendtry
   - frontendtry
 
 cleanup:
-  stage: backendtry
+  stage: cleanup_stage
   variables:
     GIT_STRATEGY: none
   tags:
