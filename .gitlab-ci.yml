@@ -50,6 +50,8 @@ frontend-build:
       - frontend/*
   tags:
     - vue
+  before_script:
+    - sudo chown -R gitlab-runner /home/gitlab-runner/builds/
   script:
     - pm2 status
     - cd frontend
