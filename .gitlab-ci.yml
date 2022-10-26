@@ -28,6 +28,7 @@ frontend-build:
   script:
     - pm2 status
     - cd frontend
+    - npm set-script prepare ''
     - sudo npm install
     - sudo npm run build
     - pm2 delete "server_frontend" 2> /dev/null || true
