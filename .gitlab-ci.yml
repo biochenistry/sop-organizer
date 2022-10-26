@@ -40,7 +40,7 @@ backend-build:
     - pm2 status
     - cd backend
     - npm install
-    - pm2 start npm --name "server_backend" -- run start
+    - pm2 --name "server_backend" start npm -- start
 
 frontend-build:
   stage: frontendtry
