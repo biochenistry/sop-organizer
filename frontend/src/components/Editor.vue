@@ -23,9 +23,7 @@
       >
         <v-icon>mdi-trash-can</v-icon>
       </v-btn>
-      <v-btn v-if="editingFile" color="primary" @click="saveFile"
-        >Save</v-btn
-      >
+      <v-btn v-if="editingFile" color="primary" @click="saveFile">Save</v-btn>
     </v-card-title>
     <v-card-text :class="{ hide: file == null || !editingFile }">
       <div ref="quillEditor"></div>
