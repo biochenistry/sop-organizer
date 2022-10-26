@@ -31,7 +31,10 @@ backend-build:
       - frontend/*
   tags:
     - node
+  before_script:
+    - ls
   script:
+    - ls
     - pm2 status
     - cd backend
     - npm install
