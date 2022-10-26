@@ -24,7 +24,6 @@ export async function createDirectories(directory: Directory): Promise<void> {
   if (!res.ok) {
     throw new Error(res.statusText);
   }
-  
 }
 
 export async function getSops(id: number): Promise<Array<any>> {

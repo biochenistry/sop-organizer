@@ -144,7 +144,7 @@ import { SOP, Directory } from '@/types';
 // import { getDocuments } from '@/services/documents';
 import { getSOP } from '~/services/sops';
 import { changeDirectory } from '~/services/sops';
-import { getSops , getDirectories } from '~/services/directories';
+import { getSops, getDirectories } from '~/services/directories';
 
 interface State {
   isSideBarVisible: boolean;
