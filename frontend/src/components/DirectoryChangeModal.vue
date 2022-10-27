@@ -2,7 +2,7 @@
   <v-overlay :z-index="100">
     <v-card v-click-outside="closeModal" class="pa-4" light>
       <v-btn fab small color="grey" @click="closeModal">
-        <v-icon color="white">mdi-close</v-icon>
+        <v-icon color="white" @click="$emit('revertChanges')">mdi-close</v-icon>
       </v-btn>
       <v-card-title>Confirm change</v-card-title>
       <v-card-actions>
