@@ -79,3 +79,21 @@ export async function markDeleteDocument(id): Promise<void> {
     throw new Error(res.statusText);
   }
 }
+
+export async function deleteDocument(id): Promise<Document> {
+  const res = await fetch(`${BASE_URL}/documents/delete/${id}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${encodeURIComponent(
+        window.localStorage.getItem('accessToken')
+      )}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+
+  const document: Document = await res.json();
+  return document;
+}

@@ -12,6 +12,15 @@
             outlined
             @change="onVersionChange($event)"
           ></v-select>
+          <v-spacer></v-spacer>
+          <v-btn
+            v-if="isAdmin && versions.length > 1"
+            color="primary"
+            small
+            @click="isShowingAdminDeleteOverlay = true"
+          >
+            Delete version<v-icon>mdi-trash-can</v-icon>
+          </v-btn>
         </v-card-title>
         <v-card-subtitle>
           Original filename: {{ document.original_file_name }}
@@ -68,6 +77,43 @@
             </v-responsive>
           </v-card>
         </v-overlay>
+
+        <v-overlay :value="isShowingAdminDeleteOverlay" :z-index="100">
+          <v-card v-click-outside="closeAdminDeleteModal" class="pa-4 d-" light>
+            <v-responsive
+              min-width="300px"
+              width="40vw"
+              max-width="600px"
+              class="d-flex flex-column pa-4"
+            >
+              <v-card-title>Deletion Confirmation</v-card-title>
+              <V-card-text>
+                <span class="text-body-1">
+                  Are you sure that you want to delete
+                  <strong>{{ document.version_number }}</strong
+                  >?
+                </span>
+              </V-card-text>
+              <v-card-actions class="justify-space-between">
+                <v-btn @click="closeAdminDeleteModal">Cancel</v-btn>
+                <v-btn
+                  v-if="!isAwaitingAdminDeletionCall"
+                  color="primary"
+                  @click="adminDeleteDoc"
+                  >Delete</v-btn
+                >
+                <v-progress-circular
+                  v-if="isAwaitingAdminDeletionCall"
+                  indeterminate
+                  :size="40"
+                  :width="4"
+                  color="primary"
+                  class="mr-4"
+                ></v-progress-circular>
+              </v-card-actions>
+            </v-responsive>
+          </v-card>
+        </v-overlay>
       </v-card>
     </v-col>
   </v-row>
@@ -78,6 +124,7 @@ import {
   getDocument,
   getDocuments,
   markDeleteDocument,
+  deleteDocument,
   getDocumentsWithSopId,
 } from '~/services/documents';
 import { getFile } from '~/services/files';
@@ -88,6 +135,7 @@ export default {
   name: 'DocumentPage',
   async asyncData({ params, error }) {
     const documentId = params.pathMatch;
+    const isAdmin = window.localStorage.getItem('isAdmin');
     let sop, document, file, selectedVersion, versions, deleter;
 
     try {
@@ -115,6 +163,7 @@ export default {
     }
 
     return {
+      isAdmin,
       sop,
       documentId,
       document,
@@ -128,6 +177,8 @@ export default {
     return {
       isShowingDeleteOverlay: false,
       isAwaitingDeletionCall: false,
+      isShowingAdminDeleteOverlay: false,
+      isAwaitingAdminDeletionCall: false,
       versions: [],
       selectedVersion: {},
     };
@@ -158,6 +209,32 @@ export default {
         })
         .finally(() => {
           this.isAwaitingDeletionCall = false;
+        });
+    },
+    closeAdminDeleteModal() {
+      this.isShowingAdminDeleteOverlay = false;
+    },
+    async adminDeleteDoc() {
+      this.isAwaitingAdminDeletionCall = true;
+      deleteDocument(this.documentId)
+        .then(async (latestDocument) => {
+          this.versions = await getDocumentsWithSopId(this.sop.id);
+          this.versions.map((doc_version) => {
+            doc_version.version_number =
+              'Version ' + doc_version.version_number;
+          });
+          this.$router.push(`/document/${latestDocument.id}`);
+          this.closeAdminDeleteModal();
+        })
+        .catch((err) => {
+          this.error({
+            statusCode: 500,
+            message: 'Something went wrong while deleting this version.',
+            error: err,
+          });
+        })
+        .finally(() => {
+          this.isAwaitingAdminDeletionCall = false;
         });
     },
     onVersionChange(event) {

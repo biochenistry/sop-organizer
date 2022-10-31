@@ -236,6 +236,29 @@ const markForDeletion = (req, res) => {
     });
   });
 };
+
+const deleteDocument = (req, res) => {
+  // TODO - fix the auth routes/helpers so that the access token logic is done there
+  const accessToken = req.headers.authorization?.split(' ')[1];
+
+  jwt.verify(accessToken, config.secret, (err, decoded) => {
+    // if (err) {
+    //   return res.status(401).send({ message: 'Unauthorized!' });
+    // }
+
+    Document.delete(req.params.id, (err, doc) => {
+      if (err) {
+        res.status(500).send({
+          message: 'An error occurred while deleting the document.',
+        });
+        return;
+      }
+      res.status(200).send(doc);
+      return;
+    });
+  });
+};
+
 export default {
   getAll,
   getById,
@@ -243,4 +266,5 @@ export default {
   updateExisting,
   save,
   markForDeletion,
+  deleteDocument,
 };
