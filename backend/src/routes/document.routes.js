@@ -7,6 +7,7 @@ const DocumentRoutes = (app) => {
   router.get('/', documents.getAll);
   router.get('/:id', documents.getById);
   router.patch('/mark-delete/:id', documents.markForDeletion);
+  router.delete('/delete/:id', documents.deleteDocument);
   router.post('/uploadNew', documents.uploadNew);
   router.post('/updateExisting', documents.updateExisting);
   router.post('/save', documents.save);

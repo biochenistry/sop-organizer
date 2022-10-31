@@ -278,4 +278,70 @@ Document.markForDeletion = (id, userId, resultCallback) => {
   );
 };
 
+Document.delete = (documentId, resultCallback) => {
+  sql.query(
+    'SELECT * FROM documents WHERE id = ?',
+    [documentId],
+    (err, res) => {
+      if (err) {
+        console.log(`Error: ${err.message}`);
+        if (err.sqlMessage) console.log(`SQL Error: ${err.sqlMessage}`);
+        resultCallback(err, null);
+        return;
+      }
+      const document = JSON.parse(JSON.stringify(res))[0];
+      const documentPath = `${STORAGE_DIR}/${document.location}/${document.version_number}.html`;
+      if (fs.existsSync(documentPath)) {
+        fs.unlinkSync(documentPath);
+        sql.query(
+          'DELETE FROM documents WHERE id = ?',
+          [documentId],
+          (err, res) => {
+            if (err) {
+              console.log(`Error: ${err.message}`);
+              if (err.sqlMessage) console.log(`SQL Error: ${err.sqlMessage}`);
+              resultCallback(err, null);
+              return;
+            }
+            sql.query(
+              'SELECT * FROM documents WHERE sop_id = ?',
+              [document.sop_id],
+              (err, res) => {
+                if (err) {
+                  console.log(`Error: ${err.message}`);
+                  if (err.sqlMessage)
+                    console.log(`SQL Error: ${err.sqlMessage}`);
+                  resultCallback(err, null);
+                  return;
+                }
+                const remainingDocuments = JSON.parse(JSON.stringify(res));
+                const latestDocument =
+                  remainingDocuments[remainingDocuments.length - 1];
+                sql.query(
+                  'UPDATE sops SET latest_version_document_id = ? WHERE id = ?',
+                  [latestDocument.id, latestDocument.sop_id],
+                  (err, res) => {
+                    if (err) {
+                      console.log(`Error: ${err.message}`);
+                      if (err.sqlMessage)
+                        console.log(`SQL Error: ${err.sqlMessage}`);
+                      resultCallback(err, null);
+                      return;
+                    }
+                    resultCallback(null, latestDocument);
+                    return;
+                  }
+                );
+              }
+            );
+          }
+        );
+      } else {
+        resultCallback(true, null);
+        return;
+      }
+    }
+  );
+};
+
 export default Document;
