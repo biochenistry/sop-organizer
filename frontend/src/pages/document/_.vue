@@ -13,14 +13,56 @@
             @change="onVersionChange($event)"
           ></v-select>
           <v-spacer></v-spacer>
-          <v-btn
-            v-if="isAdmin && versions.length > 1"
-            color="primary"
-            small
-            @click="isShowingAdminDeleteOverlay = true"
-          >
-            Delete version<v-icon>mdi-trash-can</v-icon>
-          </v-btn>
+          
+          <v-card-title>
+            Options
+            <v-menu bottom left>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  color="primary"
+                  icon
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  <v-icon>mdi-dots-vertical</v-icon>
+                </v-btn>
+
+                
+              </template>
+
+              <v-list>
+                <v-list-item @click="$refs.editorRef.editFile()">
+                  Edit
+                </v-list-item>
+                
+                <v-list-item @click="$refs.editorRef.selectFile()">Upload new version
+                  <!-- <v-btn @click="$refs.editorRef.selectFile()">Upload new version</v-btn> -->
+                  <input
+                    ref="updateExistingDocument"
+                    type="file"
+                    hidden
+                    @change="$refs.editorRef.rememberFileSelection()"
+                  />
+                </v-list-item>
+
+                <v-list-item 
+                    v-if="!editingFile"
+                    :disabled="Boolean(document.marked_for_deletion_by_user_id)"
+                    @click="isShowingDeleteOverlay = true">   
+                    Mark SOP for deletion<v-icon>mdi-trash-can</v-icon>
+                </v-list-item>
+
+                <v-list-item v-if="isAdmin && versions.length > 1" @click="isShowingAdminDeleteOverlay = true">
+                  Delete version<v-icon>mdi-trash-can</v-icon>
+                </v-list-item>    
+                
+                <v-list-item @click="isShowingRenameOverlay = true">
+                  Rename
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-card-title>
+
         </v-card-title>
         <v-card-subtitle>
           Original filename: {{ document.original_file_name }}
@@ -32,6 +74,7 @@
         <editor
           :file="file"
           :document="document"
+          ref="editorRef"
           @delete-file="isShowingDeleteOverlay = true"
         />
 
@@ -114,6 +157,38 @@
             </v-responsive>
           </v-card>
         </v-overlay>
+
+        <v-overlay :value="isShowingRenameOverlay" :z-index="100">
+          <v-card v-click-outside="closeRenameModal" class="pa-4 d-" light>
+            <v-responsive
+              min-width="300px"
+              width="40vw"
+              max-width="600px"
+              class="d-flex flex-column pa-4"
+            >
+            <v-card-title>Rename SOP</v-card-title>  
+            <v-text-field autofocus :id="newName" v-model="newName">{{this.newName}}</v-text-field>
+              <v-card-actions class="justify-space-between">
+                <v-btn @click="closeRenameModal">Cancel</v-btn>
+                <v-btn
+                  v-if="!isAwaitingRenameCall"
+                  color="primary"
+                  @click="renameOnClick"
+                  >Rename</v-btn
+                >
+                <v-progress-circular
+                  v-if="isAwaitingRenameCall"
+                  indeterminate
+                  :size="40"
+                  :width="4"
+                  color="primary"
+                  class="mr-4"
+                ></v-progress-circular>
+              </v-card-actions>              
+            </v-responsive>
+          </v-card>
+        </v-overlay>
+
       </v-card>
     </v-col>
   </v-row>
@@ -130,17 +205,19 @@ import {
 import { getFile } from '~/services/files';
 import { getSOP } from '~/services/sops';
 import { getUser } from '~/services/users';
+import { rename } from '~/services/sops';
 
 export default {
   name: 'DocumentPage',
   async asyncData({ params, error }) {
     const documentId = params.pathMatch;
     const isAdmin = window.localStorage.getItem('isAdmin');
-    let sop, document, file, selectedVersion, versions, deleter;
+    let sop, document, file, selectedVersion, versions, deleter, newName;
 
     try {
       document = await getDocument(documentId);
       sop = await getSOP(document.sop_id);
+      newName = sop.name;
       file = await getFile(
         `${document.location}${document.version_number}.html`
       );
@@ -171,16 +248,19 @@ export default {
       versions,
       selectedVersion,
       deleter,
+      newName,
     };
   },
   data() {
     return {
       isShowingDeleteOverlay: false,
+      isShowingRenameOverlay: false,
       isAwaitingDeletionCall: false,
       isShowingAdminDeleteOverlay: false,
       isAwaitingAdminDeletionCall: false,
       versions: [],
       selectedVersion: {},
+      newName: '',
     };
   },
   head() {
@@ -191,6 +271,9 @@ export default {
   methods: {
     closeDeleteModal() {
       this.isShowingDeleteOverlay = false;
+    },
+    closeRenameModal() {
+      this.isShowingRenameOverlay = false;
     },
     markDocForDeletion() {
       this.isAwaitingDeletionCall = true;
@@ -239,6 +322,24 @@ export default {
     },
     onVersionChange(event) {
       this.$router.push(`/document/${event.id}`);
+    },
+    async renameOnClick() {
+      this.isAwaitingRenameCall = true;
+      rename(this.sop.id, this.sop, this.newName)
+        .then(async () => {
+            this.$root.$emit('refresh')  
+            this.closeRenameModal();
+          })
+        .catch((err) => {
+          this.error({
+            statusCode: 500,
+            message: 'Something went wrong while renaming this SOP.',
+            error: err,
+          });
+        })
+        .finally(() => {
+          this.isAwaitingRenameCall = false;
+        });
     },
   },
 };

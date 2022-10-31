@@ -1,28 +1,8 @@
 <template>
   <v-card v-if="file">
     <v-card-title class="headline justify-space-between">
-      <v-btn color="primary" @click="selectFile">Upload new version</v-btn>
-      <input
-        ref="updateExistingDocument"
-        type="file"
-        hidden
-        @change="rememberFileSelection"
-      />
-    </v-card-title>
-    <v-card-title class="headline justify-space-between">
-      <v-btn color="primary" @click="editFile">{{
-        editingFile ? 'Cancel' : 'Edit'
-      }}</v-btn>
-      <v-btn
-        v-if="!editingFile"
-        :disabled="Boolean(document.marked_for_deletion_by_user_id)"
-        fab
-        color="secondary"
-        small
-        @click="emitDeletion"
-      >
-        <v-icon>mdi-trash-can</v-icon>
-      </v-btn>
+      <v-btn color="primary" :class="{hide:!editingFile}" @click="cancelEdit">Cancel</v-btn>
+
       <v-btn v-if="editingFile" color="primary" @click="saveFile">Save</v-btn>
     </v-card-title>
     <v-card-text :class="{ hide: file == null || !editingFile }">
@@ -100,6 +80,9 @@ export default defineComponent({
     }
   },
   methods: {
+    cancelEdit(){
+      this.editingFile = false;
+    },
     editFile() {
       this.editingFile = !this.editingFile;
       if (this.editingFile === false) {
