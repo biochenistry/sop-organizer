@@ -198,6 +198,9 @@ export default defineComponent({
     },
   },
   mounted() {
+    this.$root.$on('refresh', () => {
+      this.updateDocuments();
+    }),
     this.updateDocuments();
     this.checkAuthentication();
   },

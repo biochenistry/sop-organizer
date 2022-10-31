@@ -55,3 +55,24 @@ export async function changeDirectory(
     throw new Error(res.statusText);
   }
 }
+
+export async function rename(
+  sop_id: Number,
+  sop: SOP,
+  newName: String
+): Promise<void> {
+  sop.name = newName
+  console.log(`${sop_id}`);
+  console.log(`${JSON.stringify(sop)}`);
+  const res = await fetch(`${BASE_URL}/sops/${sop_id}`, {
+    method: 'PATCH',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(sop),
+  });
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+}
