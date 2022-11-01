@@ -167,4 +167,8 @@ export default defineComponent({
 .hide {
   display: none !important;
 }
+
+.ql-editor {
+  font-size: 1.005rem;
+}
 </style>
