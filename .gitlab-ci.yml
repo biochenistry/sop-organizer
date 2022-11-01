@@ -9,8 +9,8 @@ cleanup:
     refs:
       - main
     changes:
-      - backend/*
-      - frontend/*
+      - backend/**/*
+      - frontend/**/*
   variables:
     GIT_STRATEGY: none
   tags:
@@ -27,8 +27,8 @@ backend-build:
     refs:
       - main
     changes:
-      - backend/*
-      - frontend/*
+      - backend/**/*
+      - frontend/**/*
   tags:
     - node
   before_script:
@@ -49,8 +49,8 @@ frontend-build:
     refs:
       - main
     changes:
-      - backend/*
-      - frontend/*
+      - backend/**/*
+      - frontend/**/*
   tags:
     - vue
   before_script:
