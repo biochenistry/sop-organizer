@@ -34,6 +34,7 @@
           to=""
           router
           exact
+          @click="toggleExpansion(i)"
         >
           <v-list-item-content>
             <Upload
@@ -47,12 +48,15 @@
                 group="sops"
                 @change="handleChanges($event, directory.sops, directory)"
               >
+              <!-- the click.stop is neccesary for making sure the directory doesn't collapse when you select an SOP-->
                 <v-list-item
                   v-for="(sop, j) in directory.sops"
                   :key="`${directory}-${sop.name}-${j}`"
                   :to="`/document/${sop.latest_version_document_id}`"
                   router
                   exact
+                  v-show="isExpanded(i)"
+                  @click.stop=""
                 >
                   <v-list-item-title
                     class="pl-4"
@@ -182,6 +186,7 @@ export default defineComponent({
       directories: [],
       search: '',
       directoryChanges: [],
+      expandedGroup: [] //Array of indices of expanded groups
     };
   },
   computed: {
@@ -212,6 +217,7 @@ export default defineComponent({
         .then((directories) => {
           directories.forEach((directory, index) => {
             directory.sops = [];
+            this.expandedGroup.push(index);
             getSops(directory.id)
               .then((sops) => {
                 sops.forEach((sop, sopIndex) => {
@@ -258,6 +264,18 @@ export default defineComponent({
       });
       this.showDirectoryChangeModal = true;
     },
+
+    isExpanded(i) {
+    	return this.expandedGroup.indexOf(i) !== -1;
+    },
+    
+    toggleExpansion(i) {
+    	if (this.isExpanded(i))
+      	    this.expandedGroup.splice(this.expandedGroup.indexOf(i), 1);
+        else
+      	    this.expandedGroup.push(i);
+    },
+
     acceptChanges() {
       let oldDirectory;
       let newDirectory;
