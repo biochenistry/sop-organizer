@@ -4,6 +4,8 @@
       <v-card>
         <v-card-title>
           {{ sop.name }}<v-spacer></v-spacer>
+        </v-card-title>
+        <v-card-title>
           <v-select
             v-model="selectedVersion"
             :items="versions"
@@ -14,7 +16,7 @@
           ></v-select>
           <v-spacer></v-spacer>
           
-          <v-card-title>
+
             Options
             <v-menu bottom left>
               <template v-slot:activator="{ on, attrs }">
@@ -63,7 +65,6 @@
             </v-menu>
           </v-card-title>
 
-        </v-card-title>
         <v-card-subtitle>
           Original filename: {{ document.original_file_name }}
         </v-card-subtitle>

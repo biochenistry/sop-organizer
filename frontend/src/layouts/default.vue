@@ -250,6 +250,7 @@ export default defineComponent({
         this.username = window.localStorage.getItem('username');
         this.isLoggedIn = true;
         this.isLoggingIn = false;
+        //window.localStorage.setItem('isLoggedIn', this.isLoggedIn);
       }
     },
     logout() {
