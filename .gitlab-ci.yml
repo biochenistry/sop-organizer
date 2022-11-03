@@ -5,9 +5,6 @@ stages:
 
 cleanup:
   stage: cleanup_stage
-  only:
-    refs:
-      - main
   variables:
     GIT_STRATEGY: none
   tags:
@@ -18,13 +15,10 @@ cleanup:
     - sudo rm -rf /home/gitlab-runner/builds/*
     - sudo chown -R gitlab-runner /home/gitlab-runner/builds/
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
 
 backend-build:
   stage: backendtry
-  only:
-    refs:
-      - main
   tags:
     - node
   before_script:
@@ -37,15 +31,12 @@ backend-build:
     - npm install
     - pm2 --name "server_backend" start npm -- start
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
 
 frontend-build:
   stage: frontendtry
   variables: 
     GIT_STRATEGY: clone
-  only:
-    refs:
-      - main
   tags:
     - vue
   before_script:
@@ -61,4 +52,4 @@ frontend-build:
     - sudo npm run build
     - pm2 start
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
