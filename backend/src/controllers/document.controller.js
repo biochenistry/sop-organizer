@@ -59,7 +59,7 @@ const uploadNew = (req, res) => {
             });
             return;
           }
-          res.send(data);
+          res.send(data2);
         }
       );
     });

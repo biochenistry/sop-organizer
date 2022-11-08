@@ -61,7 +61,7 @@ export async function rename(
   sop: SOP,
   newName: String
 ): Promise<void> {
-  sop.name = newName
+  sop.name = newName;
   console.log(`${sop_id}`);
   console.log(`${JSON.stringify(sop)}`);
   const res = await fetch(`${BASE_URL}/sops/${sop_id}`, {
