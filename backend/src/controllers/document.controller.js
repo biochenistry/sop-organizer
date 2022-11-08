@@ -259,6 +259,54 @@ const deleteDocument = (req, res) => {
   });
 };
 
+const download = (req, res) => {
+  const accessToken = req.headers.authorization?.split(' ')[1];
+
+  jwt.verify(accessToken, config.secret, (err, decoded) => {
+    // if (err) {
+    //   return res.status(401).send({ message: 'Unauthorized!' });
+    // }
+    Document.download(req.body, (err, downloadUrl) => {
+      if (err) {
+        res.status(500).send({
+          message: 'An error occurred while downloading the document.',
+        });
+        return;
+      }
+      res.status(200).send(downloadUrl);
+
+      // delete the file after 5 minutes have passed (in case it still exists)
+      setTimeout(() => {
+        Document.afterDownload(req.body, (err, message) => {
+          // do nothing regardless of an error or a message.
+          // If an error occurred, it's likely because the file was already deleted
+        });
+      }, 300000);      
+    return;
+    });
+  });
+};
+
+const afterDownload = (req, res) => {
+  const accessToken = req.headers.authorization?.split(' ')[1];
+
+  jwt.verify(accessToken, config.secret, (err, decoded) => {
+    // if (err) {
+    //   return res.status(401).send({ message: 'Unauthorized!' });
+    // }
+    Document.afterDownload(req.body, (err, message) => {
+      if (err) {
+        res.status(500).send({
+          message: 'An error occurred while downloading the document.',
+        });
+        return;
+      }
+      res.status(200).send(message);
+      return;
+    });
+  });
+};
+
 export default {
   getAll,
   getById,
@@ -267,4 +315,6 @@ export default {
   save,
   markForDeletion,
   deleteDocument,
+  download,
+  afterDownload,
 };

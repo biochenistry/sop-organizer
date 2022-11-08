@@ -344,4 +344,82 @@ Document.delete = (documentId, resultCallback) => {
   );
 };
 
+Document.download = (document, resultCallback) => {
+
+  // At this point, version_number is looks like "Version 2", so we must remove the "Version " part
+  const version = document.version_number.split(' ')[1]
+  let path = `${STORAGE_DIR}/${document.location}/${version}.html`;
+
+  sql.query(
+    'SELECT name FROM sops WHERE id = ?',
+    [document.sop_id],
+    (err, res) => {
+      if (err) {
+        console.log(`Error: ${err.message}`);
+      }
+      let sopName = JSON.parse(JSON.stringify(res))[0].name;
+      console.log(sopName);
+      sopName = sopName.replace(/\.[^/.]+$/, ""); // remove file extensions if any
+      // for some reason, we need quotes if sopName has spaces
+      const downloadPath = `${STORAGE_DIR}/${document.location}/"${sopName}.docx"`;
+      console.log(downloadPath);
+
+      console.log(
+        `${PANDOC_DIR} ${path} -o ${downloadPath}` 
+      );
+      exec(
+        `${PANDOC_DIR} ${path} -o ${downloadPath}`,
+        function (error, stdOut, stdErr) {
+          if (error !== null) {
+            console.log('exec error: ' + error);
+            console.log('stdout: ' + stdOut);
+            console.log('stderr: ' + stdErr);
+          }
+          const downloadUrl = `${document.location}/${sopName}.docx`;
+          console.log(downloadUrl);
+          resultCallback(null, downloadUrl);
+        }
+      );    
+    }
+  )
+};
+
+Document.afterDownload = (document, resultCallback) => {
+
+  // At this point, version_number is looks like "Version 2", so we must remove the "Version " part
+  console.log(document);
+  const version = document.version_number.split(' ')[1]
+  const path = `${STORAGE_DIR}/${document.location}/${version}.html`;
+  
+  sql.query(
+    'SELECT name FROM sops WHERE id = ?',
+    [document.sop_id],
+    (err, res) => {
+      if (err) {
+        console.log(`Error: ${err.message}`);
+      }
+      let sopName = JSON.parse(JSON.stringify(res))[0].name;
+      console.log(sopName);
+      sopName = sopName.replace(/\.[^/.]+$/, ""); // remove file extensions if any
+
+      // for some reason, we don't need quotes even if sopName has spaces
+      const pathToDelete = `${STORAGE_DIR}/${document.location}/${sopName}.docx`;
+
+      console.log(
+        `Deleting ${pathToDelete}`
+      );
+      // resultCallback(null, "success");
+    
+      fs.unlink(pathToDelete, (err => {
+        if(err) {
+          console.log('Error deleting file: ' + err);
+        }
+        resultCallback(null, "success");
+      }))
+    }
+  )
+  
+  
+};
+
 export default Document;

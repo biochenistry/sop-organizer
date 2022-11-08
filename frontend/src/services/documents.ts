@@ -97,3 +97,25 @@ export async function deleteDocument(id): Promise<Document> {
   const document: Document = await res.json();
   return document;
 }
+
+export async function downloadDocument(document: Document): Promise<string> {
+  const res = await fetch(`${BASE_URL}/documents/download/`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json', 
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${encodeURIComponent(
+        window.localStorage.getItem('accessToken')
+      )}`,
+    },
+    body: JSON.stringify(document)
+  });
+
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+  const extension = await res.text()
+  const downloadUrl = `${BASE_URL}/files/${extension}`;
+  return downloadUrl;
+
+}

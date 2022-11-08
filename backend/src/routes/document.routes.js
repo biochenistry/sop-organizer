@@ -11,6 +11,8 @@ const DocumentRoutes = (app) => {
   router.post('/uploadNew', documents.uploadNew);
   router.post('/updateExisting', documents.updateExisting);
   router.post('/save', documents.save);
+  router.post('/download', documents.download);
+  router.delete('/afterDownload', documents.afterDownload);
 
   app.use('/documents', router);
 };
