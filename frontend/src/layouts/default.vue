@@ -40,6 +40,7 @@
             <Upload
               :directory-name="directory.name"
               :is-logged-in="isLoggedIn"
+              @emitOpenCreateSopModal="createSop"
               @refresh="updateDocuments"
             />
             <v-list>
@@ -48,21 +49,21 @@
                 group="sops"
                 @change="handleChanges($event, directory.sops, directory)"
               >
-              <!-- the click.stop is neccesary for making sure the directory doesn't collapse when you select an SOP-->
+                <!-- the click.stop is neccesary for making sure the directory doesn't collapse when you select an SOP-->
                 <v-list-item
                   v-for="(sop, j) in directory.sops"
-                  :key="`${directory}-${sop.name}-${j}`"
+                  v-show="isExpanded(i)"
+                  :key="`${directory}-${removeExtension(sop.name)}-${j}`"
                   :to="`/document/${sop.latest_version_document_id}`"
                   router
                   exact
-                  v-show="isExpanded(i)"
                   @click.stop=""
                 >
                   <v-list-item-title
                     class="pl-4"
                     style="max-width: 100%; text-overflow: ellipsis"
                   >
-                    <v-icon>mdi-file-document</v-icon> {{ sop.name }}
+                    <v-icon>mdi-file-document</v-icon> {{ removeExtension(sop.name) }}
                   </v-list-item-title>
                 </v-list-item>
               </draggable>
@@ -133,6 +134,11 @@
       @revertChanges="revertChanges"
       @clearDirectoryChangeModal="showDirectoryChangeModal = false"
     />
+    <CreateSopModal
+      v-if="showCreateSopModal"
+      :initial-form-data="formData"
+      @emitCloseCreateSopModal="showCreateSopModal = false"
+    />
   </v-app>
 </template>
 
@@ -143,6 +149,7 @@ import LoginModal from '@/components/LoginModal.vue';
 import RegisterModal from '@/components/RegisterModal.vue';
 import DirectoryModal from '@/components/DirectoryModal.vue';
 import DirectoryChangeModal from '@/components/DirectoryChangeModal.vue';
+import CreateSopModal from '@/components/CreateSopModal.vue';
 import Upload from '@/components/Upload.vue';
 import { SOP, Directory } from '@/types';
 // import { getDocuments } from '@/services/documents';
@@ -158,6 +165,7 @@ interface State {
   showRegModal: boolean;
   showDirModal: boolean;
   showDirectoryChangeModal: boolean;
+  showCreateSopModal: boolean;
   title: String;
   sops: Array<SOP>;
   directories: Array<Directory>;
@@ -182,11 +190,13 @@ export default defineComponent({
       isLoggingIn: false,
       showDirModal: false,
       showDirectoryChangeModal: false,
+      showCreateSopModal: false,
       isLoading: true,
       directories: [],
       search: '',
       directoryChanges: [],
-      expandedGroup: [] //Array of indices of expanded groups
+      expandedGroup: [], // Array of indices of expanded groups
+      formData: [],
     };
   },
   computed: {
@@ -206,7 +216,7 @@ export default defineComponent({
     this.$root.$on('refresh', () => {
       this.updateDocuments();
     }),
-    this.updateDocuments();
+      this.updateDocuments();
     this.checkAuthentication();
   },
   methods: {
@@ -250,7 +260,7 @@ export default defineComponent({
         this.username = window.localStorage.getItem('username');
         this.isLoggedIn = true;
         this.isLoggingIn = false;
-        //window.localStorage.setItem('isLoggedIn', this.isLoggedIn);
+        // window.localStorage.setItem('isLoggedIn', this.isLoggedIn);
       }
     },
     logout() {
@@ -267,14 +277,13 @@ export default defineComponent({
     },
 
     isExpanded(i) {
-    	return this.expandedGroup.indexOf(i) !== -1;
+      return this.expandedGroup.includes(i);
     },
-    
+
     toggleExpansion(i) {
-    	if (this.isExpanded(i))
-      	    this.expandedGroup.splice(this.expandedGroup.indexOf(i), 1);
-        else
-      	    this.expandedGroup.push(i);
+      if (this.isExpanded(i))
+        this.expandedGroup.splice(this.expandedGroup.indexOf(i), 1);
+      else this.expandedGroup.push(i);
     },
 
     acceptChanges() {
@@ -316,6 +325,13 @@ export default defineComponent({
       this.directoryChanges = [];
       this.showDirectoryChangeModal = false;
     },
+    createSop(formData) {
+      this.showCreateSopModal = true;
+      this.formData = formData;
+    },
+    removeExtension(str){
+      return str.replace(/\.[^/.]+$/, "");
+    }
   },
 });
 </script>

@@ -2,9 +2,7 @@
   <v-row justify="center" align="center">
     <v-col>
       <v-card>
-        <v-card-title>
-          {{ sop.name }}<v-spacer></v-spacer>
-        </v-card-title>
+        <v-card-title> {{ removeExtension(sop.name) }}<v-spacer></v-spacer> </v-card-title>
         <v-card-title>
           <v-select
             v-model="selectedVersion"
@@ -15,67 +13,63 @@
             @change="onVersionChange($event)"
           ></v-select>
           <v-spacer></v-spacer>
-          
 
-            Options
-            <v-menu bottom left>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  color="primary"
-                  icon
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  <v-icon>mdi-dots-vertical</v-icon>
-                </v-btn>
+          Options
+          <v-menu bottom left>
+            <template #activator="{ on, attrs }">
+              <v-btn color="primary" icon v-bind="attrs" v-on="on">
+                <v-icon>mdi-dots-vertical</v-icon>
+              </v-btn>
+            </template>
 
-                
-              </template>
+            <v-list>
+              <v-list-item @click="$refs.editorRef.editFile()">
+                Edit
+              </v-list-item>
 
-              <v-list>
-                <v-list-item @click="$refs.editorRef.editFile()">
-                  Edit
-                </v-list-item>
-                
-                <v-list-item @click="$refs.editorRef.selectFile()">Upload new version
-                  <!-- <v-btn @click="$refs.editorRef.selectFile()">Upload new version</v-btn> -->
-                  <input
-                    ref="updateExistingDocument"
-                    type="file"
-                    hidden
-                    @change="$refs.editorRef.rememberFileSelection()"
-                  />
-                </v-list-item>
+              <v-list-item @click="selectFile()"
+                >Upload new version
+                <input
+                  ref="updateExistingDocument"
+                  type="file"
+                  hidden
+                  @change="rememberFileSelection"
+                />
+              </v-list-item>
 
-                <v-list-item 
-                    v-if="!editingFile"
-                    :disabled="Boolean(document.marked_for_deletion_by_user_id)"
-                    @click="isShowingDeleteOverlay = true">   
-                    Mark SOP for deletion<v-icon>mdi-trash-can</v-icon>
-                </v-list-item>
+              <!-- Add v-if=!editingFile -->
+              <v-list-item
+                :disabled="Boolean(document.marked_for_deletion_by_user_id)"
+                @click="isShowingDeleteOverlay = true"
+              >
+                Mark SOP for deletion<v-icon>mdi-trash-can</v-icon>
+              </v-list-item>
 
-                <v-list-item v-if="isAdmin && versions.length > 1" @click="isShowingAdminDeleteOverlay = true">
-                  Delete version<v-icon>mdi-trash-can</v-icon>
-                </v-list-item>    
-                
-                <v-list-item @click="isShowingRenameOverlay = true">
-                  Rename
-                </v-list-item>
-              </v-list>
-            </v-menu>
-          </v-card-title>
+              <v-list-item
+                v-if="isAdmin && versions.length > 1"
+                @click="isShowingAdminDeleteOverlay = true"
+              >
+                Delete version<v-icon>mdi-trash-can</v-icon>
+              </v-list-item>
+
+              <v-list-item @click="isShowingRenameOverlay = true">
+                Rename
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </v-card-title>
 
         <v-card-subtitle>
-          Original filename: {{ document.original_file_name }}
+          Original filename: {{ removeExtension(document.original_file_name) }}
         </v-card-subtitle>
         <v-card-subtitle v-if="deleter" class="font-weight-bold">
           Marked for deletion by user: {{ deleter.name }}
         </v-card-subtitle>
 
         <editor
+          ref="editorRef"
           :file="file"
           :document="document"
-          ref="editorRef"
           @delete-file="isShowingDeleteOverlay = true"
         />
 
@@ -167,8 +161,10 @@
               max-width="600px"
               class="d-flex flex-column pa-4"
             >
-            <v-card-title>Rename SOP</v-card-title>  
-            <v-text-field autofocus :id="newName" v-model="newName">{{this.newName}}</v-text-field>
+              <v-card-title>Rename SOP</v-card-title>
+              <v-text-field :id="newName" v-model="newName" autofocus>{{
+                newName
+              }}</v-text-field>
               <v-card-actions class="justify-space-between">
                 <v-btn @click="closeRenameModal">Cancel</v-btn>
                 <v-btn
@@ -185,11 +181,10 @@
                   color="primary"
                   class="mr-4"
                 ></v-progress-circular>
-              </v-card-actions>              
+              </v-card-actions>
             </v-responsive>
           </v-card>
         </v-overlay>
-
       </v-card>
     </v-col>
   </v-row>
@@ -202,11 +197,11 @@ import {
   markDeleteDocument,
   deleteDocument,
   getDocumentsWithSopId,
+  updateExisting,
 } from '~/services/documents';
 import { getFile } from '~/services/files';
-import { getSOP } from '~/services/sops';
+import { getSOP , rename } from '~/services/sops';
 import { getUser } from '~/services/users';
-import { rename } from '~/services/sops';
 
 export default {
   name: 'DocumentPage',
@@ -259,6 +254,7 @@ export default {
       isAwaitingDeletionCall: false,
       isShowingAdminDeleteOverlay: false,
       isAwaitingAdminDeletionCall: false,
+      isAwaitingRenameCall: false,
       versions: [],
       selectedVersion: {},
       newName: '',
@@ -328,9 +324,9 @@ export default {
       this.isAwaitingRenameCall = true;
       rename(this.sop.id, this.sop, this.newName)
         .then(async () => {
-            this.$root.$emit('refresh')  
-            this.closeRenameModal();
-          })
+          this.$root.$emit('refresh');
+          this.closeRenameModal();
+        })
         .catch((err) => {
           this.error({
             statusCode: 500,
@@ -340,6 +336,47 @@ export default {
         })
         .finally(() => {
           this.isAwaitingRenameCall = false;
+        });
+    },
+    removeExtension(str) {
+      return str.replace(/\.[^/.]+$/, "");
+    },
+    selectFile() {
+      this.isSelecting = true;
+      window.addEventListener(
+        'focus',
+        () => {
+          this.isSelecting = false;
+        },
+        { once: true }
+      );
+      this.$refs.updateExistingDocument.click();
+    },
+    rememberFileSelection(event) {
+      this.selectedFile = event.target.files[0];
+      this.fileData = new FormData();
+      this.fileData.append('file', this.selectedFile);
+      this.updateExistingDocument();
+    },
+    updateExistingDocument() {
+      this.fileData.append('sop_id', this.document.sop_id);
+      this.fileData.append('editor_id', 1);
+      this.fileData.append(
+        'directory_name',
+        this.document.location.split('/')[0]
+      );
+
+      updateExisting(this.fileData)
+        .then((res) => {
+          this.$router.push(`/document/${res.id}`);
+        })
+        .catch((err) => {
+          console.log('Error updating');
+          this.error({
+            statusCode: 500,
+            message: 'Something went wrong while saving the document',
+            error: err,
+          });
         });
     },
   },

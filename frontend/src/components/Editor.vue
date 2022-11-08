@@ -1,7 +1,9 @@
 <template>
   <v-card v-if="file">
     <v-card-title class="headline justify-space-between">
-      <v-btn color="primary" :class="{hide:!editingFile}" @click="cancelEdit">Cancel</v-btn>
+      <v-btn color="primary" :class="{ hide: !editingFile }" @click="cancelEdit"
+        >Cancel</v-btn
+      >
 
       <v-btn v-if="editingFile" color="primary" @click="saveFile">Save</v-btn>
     </v-card-title>
@@ -19,7 +21,6 @@ import { defineComponent } from 'vue';
 import * as Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import {
-  updateExisting,
   save,
   getDocumentsWithSopId,
 } from '~/services/documents';
@@ -80,7 +81,7 @@ export default defineComponent({
     }
   },
   methods: {
-    cancelEdit(){
+    cancelEdit() {
       this.editingFile = false;
     },
     editFile() {
@@ -119,45 +120,6 @@ export default defineComponent({
     },
     emitDeletion() {
       this.$emit('delete-file');
-    },
-
-    selectFile() {
-      this.isSelecting = true;
-      window.addEventListener(
-        'focus',
-        () => {
-          this.isSelecting = false;
-        },
-        { once: true }
-      );
-      this.$refs.updateExistingDocument.click();
-    },
-    rememberFileSelection(event) {
-      this.selectedFile = event.target.files[0];
-      this.fileData = new FormData();
-      this.fileData.append('file', this.selectedFile);
-      this.updateExistingDocument();
-    },
-    updateExistingDocument() {
-      this.fileData.append('sop_id', this.document.sop_id);
-      this.fileData.append('editor_id', 1);
-      this.fileData.append(
-        'directory_name',
-        this.document.location.split('/')[0]
-      );
-
-      updateExisting(this.fileData)
-        .then((res) => {
-          this.$router.push(`/document/${res.id}`);
-        })
-        .catch((err) => {
-          console.log('Error updating');
-          this.error({
-            statusCode: 500,
-            message: 'Something went wrong while saving the document',
-            error: err,
-          });
-        });
     },
   },
 });

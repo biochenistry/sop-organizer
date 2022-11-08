@@ -9,18 +9,34 @@
           {{ directoryName }}
         </v-col>
         <v-col v-if="isLoggedIn" align="right" align-self="center">
-          <v-btn small @click="selectFile(directoryName)">
-            <v-icon>mdi-plus</v-icon>
-          </v-btn>
+          <div>
+            <v-menu offset-y>
+              <template #activator="{ on, attrs }">
+                <v-btn color="primary" icon v-bind="attrs" v-on="on">
+                  <v-icon>mdi-plus</v-icon>
+                </v-btn>
+              </template>
+
+              <v-list>
+                <v-list-item @click="createSop(directoryName)">
+                  Create
+                </v-list-item>
+
+                <v-list-item @click="selectFile(directoryName)">
+                  Upload
+                </v-list-item>
+                <input
+                  ref="uploadFile"
+                  type="file"
+                  hidden
+                  @change="rememberFileSelectionUpload"
+                />
+              </v-list>
+            </v-menu>
+          </div>
         </v-col>
       </v-row>
     </v-container>
-    <input
-      ref="uploadFile"
-      type="file"
-      hidden
-      @change="rememberFileSelection"
-    />
   </div>
 </template>
 
@@ -33,6 +49,7 @@ export default defineComponent({
   props: {
     directoryName: String,
     isLoggedIn: Boolean,
+    isCreatingSop: Boolean,
   },
   data: () => ({
     fileData: undefined,
@@ -56,10 +73,16 @@ export default defineComponent({
       );
       this.$refs.uploadFile.click();
     },
-    rememberFileSelection(event) {
+    rememberFileSelectionUpload(event) {
       this.fileData = new FormData();
       this.fileData.append('file', event.target.files[0]);
       this.uploadFile();
+    },
+    createSop(directoryName) {
+      this.fileData = new FormData();
+      this.fileData.append('directory_name', directoryName);
+      this.fileData.append('editor_id', 1); // placeholder for now
+      this.$emit('emitOpenCreateSopModal', this.fileData);
     },
     uploadFile() {
       this.fileData.append('directory_name', this.selectedDirectoryName);
@@ -67,6 +90,9 @@ export default defineComponent({
       this.isLoading = true;
 
       uploadNew(this.fileData)
+        .then((res) => {
+          console.log(res);
+        })
         .catch((err) => {
           console.log(err);
           // TODO - handle errors properly
