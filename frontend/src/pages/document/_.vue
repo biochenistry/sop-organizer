@@ -55,6 +55,10 @@
               <v-list-item @click="isShowingRenameOverlay = true">
                 Rename
               </v-list-item>
+
+              <v-list-item @click="downloadSop">
+                Download
+              </v-list-item>
             </v-list>
           </v-menu>
         </v-card-title>
@@ -198,6 +202,7 @@ import {
   deleteDocument,
   getDocumentsWithSopId,
   updateExisting,
+  downloadDocument,
 } from '~/services/documents';
 import { getFile } from '~/services/files';
 import { getSOP , rename } from '~/services/sops';
@@ -230,8 +235,7 @@ export default {
     } catch (err) {
       error({
         statusCode: 500,
-        message: 'Something went wrong while fetching the document',
-        error: err,
+        message: `Something went wrong while fetching the document: ${err}`
       });
     }
 
@@ -379,6 +383,17 @@ export default {
           });
         });
     },
+    downloadSop() {
+      downloadDocument(this.document)
+        .then((downloadUrl) => {
+          const documentParam = this.document;
+          console.log(downloadUrl)
+          const downloadElement = document.createElement('a');
+          document.body.appendChild(downloadElement);
+          downloadElement.href = downloadUrl ;
+          downloadElement.click()
+        })
+    }
   },
 };
 </script>
