@@ -92,6 +92,9 @@
             Create Directory
           </v-btn>
         </v-list-item>
+        <v-list-item v-if="isLoggedIn && isAdmin" class="mx-auto">
+          <v-btn align-center @click="showPrivModal = true">Edit Privileges</v-btn>
+        </v-list-item>
         <v-list-item class="mx-auto">
           <v-btn>
             <v-icon large @click="isSidebarVisible = false"
@@ -134,6 +137,7 @@
       @revertChanges="revertChanges"
       @clearDirectoryChangeModal="showDirectoryChangeModal = false"
     />
+    <PrivilegeModal v-if="showPrivModal" @clearPrivModal="showPrivModal = false"/>
     <CreateSopModal
       v-if="showCreateSopModal"
       :initial-form-data="formData"
@@ -156,6 +160,7 @@ import { SOP, Directory } from '@/types';
 import { getSOP } from '~/services/sops';
 import { changeDirectory } from '~/services/sops';
 import { getSops, getDirectories } from '~/services/directories';
+import PrivilegeModal from '~/components/PrivilegeModal.vue';
 
 interface State {
   isSideBarVisible: boolean;
@@ -165,6 +170,7 @@ interface State {
   showRegModal: boolean;
   showDirModal: boolean;
   showDirectoryChangeModal: boolean;
+  showPrivModal: boolean;
   showCreateSopModal: boolean;
   title: String;
   sops: Array<SOP>;
@@ -180,7 +186,8 @@ export default defineComponent({
     DirectoryModal,
     draggable,
     DirectoryChangeModal,
-  },
+    PrivilegeModal
+},
   data() {
     return {
       isSidebarVisible: true,
@@ -190,6 +197,7 @@ export default defineComponent({
       isLoggingIn: false,
       showDirModal: false,
       showDirectoryChangeModal: false,
+      showPrivModal: false,
       showCreateSopModal: false,
       isLoading: true,
       directories: [],
