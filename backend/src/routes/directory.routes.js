@@ -8,6 +8,7 @@ const DirectoryRoutes = (app) => {
   router.get('/:id', Directory.getById);
   router.post('/', Directory.create);
   router.get('/getSops/:id', Directory.getSopsIdsByDirectoryId);
+  router.delete('/:id', Directory.deleteById);  
 
   app.use('/directory', router);
 };

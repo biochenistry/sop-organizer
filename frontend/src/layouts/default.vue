@@ -39,8 +39,10 @@
           <v-list-item-content>
             <Upload
               :directory-name="directory.name"
+              :dirID="directory.id"
               :is-logged-in="isLoggedIn"
               @emitOpenCreateSopModal="createSop"
+              @emitDeleteDirectory="deleteDir"
               @refresh="updateDocuments"
             />
             <v-list>
@@ -161,6 +163,7 @@ import { getSOP } from '~/services/sops';
 import { changeDirectory } from '~/services/sops';
 import { getSops, getDirectories } from '~/services/directories';
 import PrivilegeModal from '~/components/PrivilegeModal.vue';
+import { deleteDirectory } from '~/services/directories';
 
 interface State {
   isSideBarVisible: boolean;
@@ -251,6 +254,7 @@ export default defineComponent({
                 this.directories = directories;
               })
               .finally(() => {
+                console.log('finally');
                 this.isLoading = false;
               });
           });
@@ -336,6 +340,25 @@ export default defineComponent({
     createSop(formData) {
       this.showCreateSopModal = true;
       this.formData = formData;
+    },
+    async deleteDir(id) {
+      if(!this.isDirectoryEmpty(id)){
+        console.log("Not empty directory");
+        //TODO: Add error modal to tell user that directory is not empty
+        return -1;
+      }
+      else{
+        console.log("Empty directory");
+        deleteDirectory(id).then((value) => {
+          if(value){
+            this.updateDocuments();
+          }
+        });
+      }
+    },
+    isDirectoryEmpty(id){
+      return this.directories.find(x => x.id === id).sops.length === 0;
+
     },
     removeExtension(str){
       return str.replace(/\.[^/.]+$/, "");
