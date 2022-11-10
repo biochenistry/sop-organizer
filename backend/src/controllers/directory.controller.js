@@ -60,4 +60,16 @@ const getSopsIdsByDirectoryId = (req, res) => {
   });
 };
 
-export default { create, getAll, getById, getSopsIdsByDirectoryId };
+const deleteById = (req, res) => {
+  Directory.deleteById(req.params.id, (err, dir) => {
+    if (err) {
+      res.status(500).send({
+        message: 'An error occurred while deleting the directory.',
+      });
+      return;
+    }
+    res.send(dir);
+  });
+};
+
+export default { create, getAll, getById, getSopsIdsByDirectoryId, deleteById };

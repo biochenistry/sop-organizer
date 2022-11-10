@@ -25,6 +25,9 @@
                 <v-list-item @click="selectFile(directoryName)">
                   Upload
                 </v-list-item>
+                <v-list-item @click="deleteDirectory(dirID)">
+                  Delete
+                </v-list-item>
                 <input
                   ref="uploadFile"
                   type="file"
@@ -48,6 +51,7 @@ export default defineComponent({
   name: 'UploadButton',
   props: {
     directoryName: String,
+    dirID: Number,
     isLoggedIn: Boolean,
     isCreatingSop: Boolean,
   },
@@ -83,6 +87,9 @@ export default defineComponent({
       this.fileData.append('directory_name', directoryName);
       this.fileData.append('editor_id', 1); // placeholder for now
       this.$emit('emitOpenCreateSopModal', this.fileData);
+    },
+    deleteDirectory(id){
+      this.$emit('emitDeleteDirectory', id);
     },
     uploadFile() {
       this.fileData.append('directory_name', this.selectedDirectoryName);

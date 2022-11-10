@@ -35,3 +35,13 @@ export async function getSops(id: number): Promise<Array<any>> {
   const directories: Array<any> = await res.json();
   return directories;
 }
+
+
+export async function deleteDirectory(id): Promise<Boolean> {
+  const res = await fetch(`${BASE_URL}/directory/${id}`, {
+    method: 'DELETE',
+    },
+  );
+
+  return true;
+};
