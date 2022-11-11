@@ -2,7 +2,9 @@
   <v-row justify="center" align="center">
     <v-col>
       <v-card>
-        <v-card-title> {{ removeExtension(sop.name) }}<v-spacer></v-spacer> </v-card-title>
+        <v-card-title>
+          {{ removeExtension(sop.name) }}<v-spacer></v-spacer>
+        </v-card-title>
         <v-card-title>
           <v-select
             v-model="selectedVersion"
@@ -56,9 +58,7 @@
                 Rename
               </v-list-item>
 
-              <v-list-item @click="downloadSop">
-                Download
-              </v-list-item>
+              <v-list-item @click="downloadSop"> Download </v-list-item>
             </v-list>
           </v-menu>
         </v-card-title>
@@ -205,7 +205,7 @@ import {
   downloadDocument,
 } from '~/services/documents';
 import { getFile } from '~/services/files';
-import { getSOP , rename } from '~/services/sops';
+import { getSOP, rename } from '~/services/sops';
 import { getUser } from '~/services/users';
 
 export default {
@@ -235,7 +235,7 @@ export default {
     } catch (err) {
       error({
         statusCode: 500,
-        message: `Something went wrong while fetching the document: ${err}`
+        message: `Something went wrong while fetching the document: ${err}`,
       });
     }
 
@@ -343,7 +343,7 @@ export default {
         });
     },
     removeExtension(str) {
-      return str.replace(/\.[^/.]+$/, "");
+      return str.replace(/\.[^/.]+$/, '');
     },
     selectFile() {
       this.isSelecting = true;
@@ -384,16 +384,14 @@ export default {
         });
     },
     downloadSop() {
-      downloadDocument(this.document)
-        .then((downloadUrl) => {
-          const documentParam = this.document;
-          console.log(downloadUrl)
-          const downloadElement = document.createElement('a');
-          document.body.appendChild(downloadElement);
-          downloadElement.href = downloadUrl ;
-          downloadElement.click()
-        })
-    }
+      downloadDocument(this.document).then((downloadUrl) => {
+        console.log(downloadUrl);
+        const downloadElement = document.createElement('a');
+        document.body.appendChild(downloadElement);
+        downloadElement.href = downloadUrl;
+        downloadElement.click();
+      });
+    },
   },
 };
 </script>

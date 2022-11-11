@@ -31,6 +31,7 @@ create table if not exists sop_database.sops (
 create table if not exists sop_database.directory_sop (
     directory_id int NOT NULL,
     sop_id int NOT NULL,
+    date_last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (directory_id) REFERENCES sop_database.directories(id),
     FOREIGN KEY (sop_id) REFERENCES sop_database.sops(id)
 );

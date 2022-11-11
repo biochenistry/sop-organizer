@@ -9,15 +9,51 @@
       class="d-flex flex-column justify-space-between"
     >
       <v-toolbar>
-        <v-text-field
-          :id="search"
-          v-model="search"
-          hide-details
-          prepend-icon="mdi-magnify"
-          single-line
-          clearable
-          placeholder="Search title"
-        ></v-text-field>
+        <v-row>
+          <v-col :cols="8">
+            <v-text-field
+              :id="search"
+              v-model="search"
+              hide-details
+              prepend-icon="mdi-magnify"
+              single-line
+              clearable
+              placeholder="Search title"
+            ></v-text-field>
+          </v-col>
+          <v-col :cols="4">
+            <v-btn
+              v-if="isSorted"
+              small
+              @click="
+                isSorted = false;
+                isSortedByDate = false;
+                isSortedByAlphabetical = false;
+              "
+            >
+              Unsort
+            </v-btn>
+            <v-menu v-if="!isSorted" offset-y>
+              <template #activator="{ on, attrs }">
+                <v-btn small v-bind="attrs" v-on="on"> Sort </v-btn>
+              </template>
+              <v-list>
+                <v-list-item @click="sortByDate(-1)">
+                  Date <v-icon>mdi-arrow-up</v-icon>
+                </v-list-item>
+                <v-list-item @click="sortByDate(1)">
+                  Date <v-icon>mdi-arrow-down</v-icon>
+                </v-list-item>
+                <v-list-item @click="sortByAlphabetical(-1)">
+                  Alphabetical <v-icon>mdi-arrow-up</v-icon>
+                </v-list-item>
+                <v-list-item @click="sortByAlphabetical(1)">
+                  Alphabetical <v-icon>mdi-arrow-down</v-icon>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-col>
+        </v-row>
       </v-toolbar>
       <div v-if="isLoading" class="text-center py-12">
         <v-progress-circular
@@ -27,7 +63,7 @@
           :width="7"
         ></v-progress-circular>
       </div>
-      <v-list v-else-if="filteredList.length">
+      <v-list v-else-if="filteredList.length && !isSorted">
         <v-list-item
           v-for="(directory, i) in filteredList"
           :key="i"
@@ -65,12 +101,29 @@
                     class="pl-4"
                     style="max-width: 100%; text-overflow: ellipsis"
                   >
-                    <v-icon>mdi-file-document</v-icon> {{ removeExtension(sop.name) }}
+                    <v-icon>mdi-file-document</v-icon>
+                    {{ removeExtension(sop.name) }}
                   </v-list-item-title>
                 </v-list-item>
               </draggable>
             </v-list>
           </v-list-item-content>
+        </v-list-item>
+      </v-list>
+      <v-list v-else-if="isSorted">
+        <v-list-item
+          v-for="(sop, j) in filteredSortedList"
+          :key="`${removeExtension(sop.name)}-${j}`"
+          :to="`/document/${sop.latest_version_document_id}`"
+          router
+          exact
+        >
+          <v-list-item-title
+            class="pl-4"
+            style="max-width: 100%; text-overflow: ellipsis"
+          >
+            <v-icon>mdi-file-document</v-icon> {{ removeExtension(sop.name) }}
+          </v-list-item-title>
         </v-list-item>
       </v-list>
       <div v-else class="text-center">
@@ -208,6 +261,10 @@ export default defineComponent({
       directoryChanges: [],
       expandedGroup: [], // Array of indices of expanded groups
       formData: [],
+      sops: [],
+      isSorted: false,
+      isSortedByDate: false,
+      isSortedByAlphabetical: false,
     };
   },
   computed: {
@@ -222,6 +279,14 @@ export default defineComponent({
         ),
       }));
     },
+    filteredSortedList() {
+      if (this.search == null || this.search == '') {
+        return this.sops;
+      }
+      return this.sops.filter((sop) => {
+        return sop.name.toLowerCase().includes(this.search.toLowerCase());
+      });
+    },
   },
   mounted() {
     this.$root.$on('refresh', () => {
@@ -233,18 +298,30 @@ export default defineComponent({
   methods: {
     updateDocuments() {
       // TODO - loading stuff
+      this.sops = [];
       this.isLoading = true;
       getDirectories()
         .then((directories) => {
-          directories.forEach((directory, index) => {
+          directories.forEach((directory, directoryIndex) => {
             directory.sops = [];
-            this.expandedGroup.push(index);
+            this.expandedGroup.push(directoryIndex);
             getSops(directory.id)
               .then((sops) => {
                 sops.forEach((sop, sopIndex) => {
                   getSOP(sop.sop_id).then((sop) => {
                     directory.sops.push(sop);
+                    this.sops.push(sop);
                     this.directories = directories;
+                    if (
+                      directoryIndex === directories.length - 1 &&
+                      sopIndex === sops.length - 1
+                    ) {
+                      if (this.isSortedByDate) {
+                        this.sortByDate();
+                      } else if (this.isSortedByAlphabetical) {
+                        this.sortByAlphabetical();
+                      }
+                    }
                   });
                 });
               })
@@ -340,6 +417,33 @@ export default defineComponent({
     createSop(formData) {
       this.showCreateSopModal = true;
       this.formData = formData;
+    },
+    sortByDate(direction) {
+      this.isSorted = true;
+      this.isSortedByDate = true;
+      if (direction === 1) {
+        this.sops.sort((a, b) => {
+          return (
+            new Date(b.date_last_modified).getTime() -
+            new Date(a.date_last_modified).getTime()
+          );
+        });
+      }
+      if (direction === -1) {
+        this.sops.sort((a, b) => {
+          return (
+            new Date(a.date_last_modified).getTime() -
+            new Date(b.date_last_modified).getTime()
+          );
+        });
+      }
+    },
+    sortByAlphabetical(direction) {
+      this.isSorted = true;
+      this.isSortedByAlphabetical = true;
+      if (direction === 1)
+        this.sops.sort((a, b) => a.name.localeCompare(b.name));
+      else this.sops.sort((a, b) => b.name.localeCompare(a.name));
     },
     async deleteDir(id) {
       if(!this.isDirectoryEmpty(id)){

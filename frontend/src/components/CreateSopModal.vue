@@ -35,7 +35,7 @@ export default defineComponent({
       isModalVisible: false,
       isLoading: false,
       formData: this.initialFormData,
-      hasPeriod: false
+      hasPeriod: false,
     };
   },
   methods: {
@@ -48,9 +48,9 @@ export default defineComponent({
       this.formData.append('file', new File([''], `${this.name}.html`));
 
       // No file extensions allowed
-      var nameSplit = this.name.split('.');
-      
-      if(nameSplit.length === 1) {
+      const nameSplit = this.name.split('.');
+
+      if (nameSplit.length === 1) {
         this.hasPeriod = false;
         this.isLoading = true;
         this.closeModal();
@@ -58,6 +58,7 @@ export default defineComponent({
           .then((res) => {
             console.log(res);
             this.$router.push(`/document/${res.id}`);
+            this.$root.$emit('refresh');
           })
           .catch((err) => {
             console.log(err);
@@ -66,12 +67,10 @@ export default defineComponent({
           .finally(() => {
             this.isLoading = false;
             this.closeModal();
-            this.$root.$emit('refresh');
           });
-      }
-      else {
+      } else {
         this.hasPeriod = true;
-        return;
+        
       }
     },
   },
