@@ -20,10 +20,7 @@
 import { defineComponent } from 'vue';
 import * as Quill from 'quill';
 import 'quill/dist/quill.snow.css';
-import {
-  save,
-  getDocumentsWithSopId,
-} from '~/services/documents';
+import { save, getDocumentsWithSopId } from '~/services/documents';
 import { getSOP } from '~/services/sops';
 
 export default defineComponent({
@@ -106,17 +103,20 @@ export default defineComponent({
         this.document.location.split('/')[0]
       );
 
-      try {
-        this.savedDocuments = await save(this.fileData).then((res) => {
+      this.savedDocuments = save(this.fileData)
+        .then((res) => {
           this.$router.push(`/document/${res.id}`);
-        });
-      } catch (err) {
-        error({
-          statusCode: 500,
-          message: 'Something went wrong while saving the document',
-          error: err,
-        });
-      }
+          this.$nuxt.refresh();
+          this.$root.$emit('refresh');
+        })
+        .catch((err) => {
+          error({
+            statusCode: 500,
+            message: 'Something went wrong while saving the document',
+            error: err,
+          });
+        })
+        .finally(() => {});
     },
     emitDeletion() {
       this.$emit('delete-file');
