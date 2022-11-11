@@ -13,16 +13,14 @@ export async function preregisterUser(credentials): Promise<void> {
   }
 }
 
-export async function registerUser(credentials): Promise<void> {
+export async function registerUser(credentials): Promise<Response> {
   console.log(credentials);
   const res = await fetch(`${BASE_URL}/auth/register`, {
     method: 'POST',
     body: JSON.stringify(credentials),
     headers: { 'Content-Type': 'application/json' },
   });
-  if (!res.ok) {
-    throw new Error(res.statusText);
-  }
+  return res;
 }
 
 export async function login(credentials): Promise<void> {

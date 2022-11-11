@@ -112,15 +112,19 @@ const register = (req, res) => {
   }
   try {
     connection.query(
-      `SELECT email FROM users WHERE email = '${email}'`,
+      `SELECT email, password FROM users WHERE email = '${email}'`,
       function (err, result) {
         if (err) throw err;
-        if (result.length > 0) {
-          return res.status(409).send('User already registered.');
-        } else {
+        else if (result.length === 0) {
+          return res.status(409).send('User not pre-registered by admin.');
+        }
+        else if (result[0].password !== null) {
+          return res.status(403).send('User already registered.');
+        }
+        else {
           connection.query(
-            `INSERT INTO users (id, name, email, password, privilege)
-           VALUES (0, '${req.body.name}', '${email}', '${pwd}', 0)`,
+            'UPDATE users SET name = ?, password = ? WHERE email = ?',
+            [req.body.name, pwd, `${email}`],
             function (err) {
               if (err) throw err;
               return res.send('record inserted.');
