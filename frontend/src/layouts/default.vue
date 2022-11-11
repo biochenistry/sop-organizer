@@ -331,7 +331,6 @@ export default defineComponent({
                 this.directories = directories;
               })
               .finally(() => {
-                console.log('finally');
                 this.isLoading = false;
               });
           });
