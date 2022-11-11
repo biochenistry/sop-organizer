@@ -133,4 +133,34 @@ const register = (req, res) => {
     res.status(500).send({ message: error.message });
   }
 };
-export default { signin, signout, register, changePermission, removeFile };
+
+const preregister = (req, res) => {
+  const email = req.body.email;
+  if (!validateEmail.validate(email)) {
+    return res.status(409).send('Not a valid email.');
+  }
+  try {
+    connection.query(
+      `SELECT email FROM users WHERE email = '${email}'`,
+      function (err, result) {
+        if (err) throw err;
+        if (result.length > 0) {
+          return res.status(409).send('User already registered.');
+        } else {
+          connection.query(
+            `INSERT INTO users (id, name, email, password, privilege)
+           VALUES (0, 'Not registered', '${email}', NULL, 0)`,
+            function (err) {
+              if (err) throw err;
+              return res.send('record inserted.');
+            }
+          );
+        }
+      }
+    );
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+};
+
+export default { signin, signout, register, changePermission, removeFile, preregister };

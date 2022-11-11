@@ -13,8 +13,8 @@
       <v-row>
         <v-col :cols="8">
           <v-text-field
-          :id="search"
-          v-model="search"
+          :id="email"
+          v-model="email"
           hide-details
           single-line
           clearable
@@ -22,11 +22,11 @@
           ></v-text-field>
         </v-col>
         <v-col>
-          <v-btn @click="">Add</v-btn>
+          <v-btn @click="preregisterUser">Add</v-btn>
         </v-col>
       </v-row>
-      <v-list style="overflow-y: scroll">
-        <v-list-item v-for="(user) in this.usersList" :key="user">
+      <v-list max-height="500px" style="overflow-y: scroll">
+        <v-list-item v-for="(user) in this.usersList" :key="user.id">
           <v-list-item-title>{{ user.name }}
             <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
           </v-list-item-title>
@@ -46,7 +46,9 @@
 <script lang="ts">
 import Vue, { defineComponent } from 'vue';
 import { getUsers, updateUserPriv } from '~/services/users';
+import { preregisterUser } from '~/services/auth'; 
 import { User } from '@/types/index';
+import { refresh } from 'less';
 
 export default defineComponent({
   name: 'PrivilegeModal',
@@ -54,6 +56,7 @@ export default defineComponent({
     return{
       usersList: [],
       cardKey: 0,
+      email: ""
     };
   },
   methods: {
@@ -61,12 +64,13 @@ export default defineComponent({
       this.$emit('clearPrivModal');
     },
     grabUsers(){
+      this.usersList = [];
       getUsers()
         .then((users) => {
+          console.log(users);
           for(let i = 0; i < users.length; i++){
             this.usersList.push(users[i]);
           }
-            console.log(this.privs);
         })
         .catch((err) => {
           console.log(err);
@@ -93,6 +97,12 @@ export default defineComponent({
     refresh(){
       this.cardKey += 1;
     },
+    preregisterUser() {
+      preregisterUser({email: this.email})
+        .then(() => {
+          this.grabUsers();
+        })
+    }
   },
   mounted() {
     this.grabUsers();
