@@ -4,11 +4,11 @@
       <v-btn fab small color="grey" @click="closeModal">
         <v-icon color="white">mdi-close</v-icon>
       </v-btn>
-      <v-card-title>User Privileges</v-card-title>
+      <v-card-title>Users</v-card-title>
       <v-responsive
       min-width="300px"
       width="40vw"
-      max-width="600px"
+      max-width="700px"
       class="d-flex flex-column pa-4">
       <v-row>
         <v-col :cols="8">
@@ -21,8 +21,11 @@
           placeholder="Email"
           ></v-text-field>
         </v-col>
-        <v-col>
+        <v-col :col="2">
           <v-btn @click="preregisterUser">Add</v-btn>
+        </v-col>
+        <v-col :col="2">
+          <v-btn @click="deleteUser">Remove</v-btn>
         </v-col>
       </v-row>
       <v-list max-height="500px" style="overflow-y: scroll">
@@ -47,6 +50,7 @@
 import Vue, { defineComponent } from 'vue';
 import { getUsers, updateUserPriv } from '~/services/users';
 import { preregisterUser } from '~/services/auth'; 
+import { deleteUser } from '~/services/users'; 
 import { User } from '@/types/index';
 import { refresh } from 'less';
 
@@ -99,6 +103,12 @@ export default defineComponent({
     },
     preregisterUser() {
       preregisterUser({email: this.email})
+        .then(() => {
+          this.grabUsers();
+        })
+    },
+    deleteUser() {
+      deleteUser({email: this.email})
         .then(() => {
           this.grabUsers();
         })

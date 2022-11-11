@@ -70,4 +70,19 @@ User.getById = (id, resultCallback) => {
   });
 };
 
+User.deleteUser = (email, resultCallback) => {
+  sql.query('DELETE FROM users WHERE email = ?', [email], (err) => {
+    if (err) {
+      if (err.sqlMessage) {
+        console.log(`SQL Error: ${err.sqlMessage}`);
+      } else console.log(`Error: ${err.message}`);
+
+      resultCallback(err, null);
+      return;
+    }
+
+    resultCallback(undefined);
+  });
+};
+
 export default User;
