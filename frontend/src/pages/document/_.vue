@@ -25,11 +25,11 @@
             </template>
 
             <v-list>
-              <v-list-item @click="$refs.editorRef.editFile()">
+              <v-list-item v-if="isLoggedIn" @click="$refs.editorRef.editFile()">
                 Edit
               </v-list-item>
 
-              <v-list-item @click="selectFile()"
+              <v-list-item v-if="isLoggedIn" @click="selectFile()"
                 >Upload new version
                 <input
                   ref="updateExistingDocument"
@@ -41,6 +41,7 @@
 
               <!-- Add v-if=!editingFile -->
               <v-list-item
+                v-if="isLoggedIn" 
                 :disabled="Boolean(document.marked_for_deletion_by_user_id)"
                 @click="isShowingDeleteOverlay = true"
               >
@@ -54,7 +55,7 @@
                 Delete version<v-icon>mdi-trash-can</v-icon>
               </v-list-item>
 
-              <v-list-item @click="isShowingRenameOverlay = true">
+              <v-list-item v-if="isLoggedIn" @click="isShowingRenameOverlay = true">
                 Rename
               </v-list-item>
 
@@ -212,9 +213,10 @@ export default {
   name: 'DocumentPage',
   async asyncData({ params, error }) {
     const documentId = params.pathMatch;
-    const isAdmin = window.localStorage.getItem('isAdmin');
-    let sop, document, file, selectedVersion, versions, deleter, newName;
+    const isAdmin = window.localStorage.getItem('isAdmin') === 'true';
+    const isLoggedIn = window.localStorage.getItem('isLoggedIn') === 'true';
 
+    let sop, document, file, selectedVersion, versions, deleter, newName;
     try {
       document = await getDocument(documentId);
       sop = await getSOP(document.sop_id);
@@ -240,7 +242,6 @@ export default {
     }
 
     return {
-      isAdmin,
       sop,
       documentId,
       document,
@@ -249,6 +250,8 @@ export default {
       selectedVersion,
       deleter,
       newName,
+      isAdmin,
+      isLoggedIn,
     };
   },
   data() {

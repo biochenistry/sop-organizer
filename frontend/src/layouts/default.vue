@@ -292,11 +292,11 @@ export default defineComponent({
     },
   },
   mounted() {
+    this.updateDocuments();
+    this.checkAuthentication();
     this.$root.$on('refresh', () => {
       this.updateDocuments();
-    }),
-      this.updateDocuments();
-    this.checkAuthentication();
+    })
   },
   methods: {
     updateDocuments() {
@@ -361,7 +361,7 @@ export default defineComponent({
       this.isLoggedIn = false;
       this.username = '';
       this.email = '';
-      this.isAdmin = '';        
+      this.isAdmin = ''; 
     },
     handleChanges(event, list, directory) {
       this.directoryChanges.push({
