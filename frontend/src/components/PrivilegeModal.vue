@@ -28,6 +28,14 @@
           <v-btn @click="deleteUser">Remove</v-btn>
         </v-col>
       </v-row>
+      <v-list>
+        <v-list-item>
+          <v-list-item-title>Name
+            <v-list-item-subtitle>Email</v-list-item-subtitle>
+          </v-list-item-title>
+          <div>Admin?</div>
+        </v-list-item>
+      </v-list>
       <v-list max-height="500px" style="overflow-y: scroll">
         <v-list-item v-for="(user) in this.usersList" :key="user.id">
           <v-list-item-title>{{ user.name }}
