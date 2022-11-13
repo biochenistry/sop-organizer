@@ -41,7 +41,7 @@
           <v-list-item-title>{{ user.name }}
             <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
           </v-list-item-title>
-          <v-switch disabled v-if="email === user.email" input-value="true"></v-switch>
+          <v-switch disabled v-if="emailProp === user.email" input-value="true"></v-switch>
           <v-switch v-else-if="user.privilege.data !== undefined && user.privilege.data[0] === 1"
             v-model="user.privilege.data !== undefined && user.privilege.data[0] === 1"
             @click="revokeAccess(user)">
@@ -67,7 +67,7 @@ import { User } from '@/types/index';
 export default defineComponent({
   name: 'PrivilegeModal',
   props: {
-    email: String
+    emailProp: String
   },
   data(){
     return{

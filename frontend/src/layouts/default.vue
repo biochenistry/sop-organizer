@@ -148,7 +148,7 @@
             Create Directory
           </v-btn>
         </v-list-item>
-        <v-list-item v-if="isLoggedIn && isAdmin" class="mx-auto">
+        <v-list-item v-show="isAdmin" class="mx-auto">
           <v-btn align-center @click="showPrivModal = true">Edit Privileges</v-btn>
         </v-list-item>
         <v-list-item class="mx-auto">
@@ -193,7 +193,7 @@
       @revertChanges="revertChanges"
       @clearDirectoryChangeModal="showDirectoryChangeModal = false"
     />
-    <PrivilegeModal v-if="showPrivModal" @clearPrivModal="showPrivModal = false" :email="email"/>
+    <PrivilegeModal v-if="showPrivModal" @clearPrivModal="showPrivModal = false" :email-prop="email"/>
     <CreateSopModal
       v-if="showCreateSopModal"
       :initial-form-data="formData"
@@ -350,7 +350,7 @@ export default defineComponent({
       if (window.localStorage.getItem('accessToken')) {
         this.username = window.localStorage.getItem('username');
         this.email = window.localStorage.getItem('email');
-        this.isAdmin = window.localStorage.getItem('isAdmin');
+        this.isAdmin = window.localStorage.getItem('isAdmin') === 'true';
         this.isLoggedIn = true;
         this.isLoggingIn = false;
         window.localStorage.setItem('isLoggedIn', this.isLoggedIn);
@@ -359,6 +359,9 @@ export default defineComponent({
     logout() {
       window.localStorage.clear();
       this.isLoggedIn = false;
+      this.username = '';
+      this.email = '';
+      this.isAdmin = '';        
     },
     handleChanges(event, list, directory) {
       this.directoryChanges.push({
@@ -470,7 +473,7 @@ export default defineComponent({
     },
     removeExtension(str){
       return str.replace(/\.[^/.]+$/, "");
-    }
+    },
   },
 });
 </script>
