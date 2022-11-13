@@ -60,15 +60,17 @@ import { getUsers, updateUserPriv } from '~/services/users';
 import { preregisterUser } from '~/services/auth'; 
 import { deleteUser } from '~/services/users'; 
 import { User } from '@/types/index';
-import { refresh } from 'less';
 
 export default defineComponent({
   name: 'PrivilegeModal',
+  props: {
+    isAdmin: Boolean
+  },
   data(){
     return{
       usersList: [],
       cardKey: 0,
-      email: ""
+      email: "",
     };
   },
   methods: {

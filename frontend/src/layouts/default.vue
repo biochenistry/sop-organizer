@@ -138,11 +138,12 @@
           </div>
         </v-list-item>
         <v-list-item v-if="!isLoggedIn" class="mx-auto">
-          <v-btn v-if="isAdmin" align-center @click="showRegModal = true">
+          <!-- Change this: This button is visible if route is "/register" or something -->
+          <v-btn align-center @click="showRegModal = true">
             Register User
           </v-btn>
         </v-list-item>
-        <v-list-item v-if="isLoggedIn && isAdmin" class="mx-auto">
+        <v-list-item v-if="isLoggedIn" class="mx-auto">
           <v-btn align-center @click="showDirModal = true">
             Create Directory
           </v-btn>
@@ -192,7 +193,7 @@
       @revertChanges="revertChanges"
       @clearDirectoryChangeModal="showDirectoryChangeModal = false"
     />
-    <PrivilegeModal v-if="showPrivModal" @clearPrivModal="showPrivModal = false"/>
+    <PrivilegeModal v-if="showPrivModal" @clearPrivModal="showPrivModal = false" :is-admin="isAdmin"/>
     <CreateSopModal
       v-if="showCreateSopModal"
       :initial-form-data="formData"
@@ -248,7 +249,7 @@ export default defineComponent({
     return {
       isSidebarVisible: true,
       isLoggedIn: false,
-      isAdmin: true, // TODO - change this default to false, only change after check with database
+      isAdmin: false, // TODO - change this default to false, only change after check with database
       showRegModal: false,
       isLoggingIn: false,
       showDirModal: false,
@@ -348,7 +349,8 @@ export default defineComponent({
         this.username = window.localStorage.getItem('username');
         this.isLoggedIn = true;
         this.isLoggingIn = false;
-        // window.localStorage.setItem('isLoggedIn', this.isLoggedIn);
+        this.isAdmin = window.localStorage.getItem('isAdmin');
+        window.localStorage.setItem('isLoggedIn', this.isLoggedIn);
       }
     },
     logout() {
