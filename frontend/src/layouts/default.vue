@@ -193,7 +193,7 @@
       @revertChanges="revertChanges"
       @clearDirectoryChangeModal="showDirectoryChangeModal = false"
     />
-    <PrivilegeModal v-if="showPrivModal" @clearPrivModal="showPrivModal = false" :is-admin="isAdmin"/>
+    <PrivilegeModal v-if="showPrivModal" @clearPrivModal="showPrivModal = false" :email="email"/>
     <CreateSopModal
       v-if="showCreateSopModal"
       :initial-form-data="formData"
@@ -224,6 +224,7 @@ interface State {
   isLoggedIn: boolean;
   isAdmin: boolean;
   username?: String;
+  email: String,
   showRegModal: boolean;
   showDirModal: boolean;
   showDirectoryChangeModal: boolean;
@@ -249,7 +250,8 @@ export default defineComponent({
     return {
       isSidebarVisible: true,
       isLoggedIn: false,
-      isAdmin: false, // TODO - change this default to false, only change after check with database
+      isAdmin: false,
+      email: '',
       showRegModal: false,
       isLoggingIn: false,
       showDirModal: false,
@@ -347,9 +349,10 @@ export default defineComponent({
     checkAuthentication() {
       if (window.localStorage.getItem('accessToken')) {
         this.username = window.localStorage.getItem('username');
+        this.email = window.localStorage.getItem('email');
+        this.isAdmin = window.localStorage.getItem('isAdmin');
         this.isLoggedIn = true;
         this.isLoggingIn = false;
-        this.isAdmin = window.localStorage.getItem('isAdmin');
         window.localStorage.setItem('isLoggedIn', this.isLoggedIn);
       }
     },
