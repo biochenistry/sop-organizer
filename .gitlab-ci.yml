@@ -51,6 +51,6 @@ frontend-build:
     - npm set-script prepare ''
     - sudo npm install
     - sudo npm run generate
-    - export NODE_ENV=production && pm2 start
+    - pm2 --name "server_frontend" start npm -- start
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
