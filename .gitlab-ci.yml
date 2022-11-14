@@ -50,6 +50,6 @@ frontend-build:
     - npm set-script prepare ''
     - sudo npm install
     - sudo npm run build
-    - pm2 start
+    - export NODE_ENV=production && pm2 start
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
