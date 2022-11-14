@@ -49,8 +49,8 @@ frontend-build:
     - pm2 status
     - cd frontend
     - npm set-script prepare ''
-    - sudo npm install
-    - sudo npm run generate
+    - npm install
+    - npm run generate
     - pm2 --name "server_frontend" start npm -- start
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
