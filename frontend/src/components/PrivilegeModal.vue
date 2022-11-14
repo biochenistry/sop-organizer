@@ -47,9 +47,8 @@
             @click="revokeAccess(user)">
           </v-switch>
           <v-switch v-else-if="user.name !== 'Not registered' && user.privilege.data !== undefined && user.privilege.data[0] === 0"
-            v-model="user.privilege.data !== undefined && user.privilege.data[0] === 1"
-            @click="grantAccess(user)">
-          </v-switch>
+          v-model="user.privilege.data !== undefined && user.privilege.data[0] === 1"
+          @click="grantAccess(user)"></v-switch>
         </v-list-item>
       </v-list>
       </v-responsive>

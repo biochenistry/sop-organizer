@@ -224,7 +224,6 @@ interface State {
   isLoggedIn: boolean;
   isAdmin: boolean;
   username?: String;
-  email: String,
   showRegModal: boolean;
   showDirModal: boolean;
   showDirectoryChangeModal: boolean;
@@ -250,7 +249,7 @@ export default defineComponent({
     return {
       isSidebarVisible: true,
       isLoggedIn: false,
-      isAdmin: false,
+      isAdmin: false, // TODO - change this default to false, only change after check with database
       email: '',
       showRegModal: false,
       isLoggingIn: false,
