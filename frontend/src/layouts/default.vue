@@ -348,12 +348,13 @@ export default defineComponent({
     checkAuthentication() {
       if (window.localStorage.getItem('accessToken')) {
         this.username = window.localStorage.getItem('username');
-        // this.email = window.localStorage.getItem('email');
-        // this.isAdmin = window.localStorage.getItem('isAdmin') === 'true';
-        this.isLoggedIn = true;
+        this.email = window.localStorage.getItem('email');
+        this.isAdmin = window.localStorage.getItem('isAdmin') === 'true';
+        this.isLoggedIn = true
         this.isLoggingIn = false;
         this.isAdmin = window.localStorage.getItem('isAdmin');
         window.localStorage.setItem('isLoggedIn', this.isLoggedIn);
+        this.$root.$emit('authChange');
       }
     },
     logout() {
@@ -362,6 +363,7 @@ export default defineComponent({
       this.username = '';
       this.email = '';
       this.isAdmin = ''; 
+      this.$root.$emit('authChange');
     },
     handleChanges(event, list, directory) {
       this.directoryChanges.push({

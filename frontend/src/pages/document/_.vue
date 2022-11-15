@@ -272,6 +272,12 @@ export default {
       title: `${this.sop?.name} - Version ${this.document?.version_number}`,
     };
   },
+  mounted() {
+    this.$root.$on('authChange', () => {
+      this.isAdmin = window.localStorage.getItem('isAdmin') === 'true';
+      this.isLoggedIn = window.localStorage.getItem('isLoggedIn') === 'true';
+    })
+  },
   methods: {
     closeDeleteModal() {
       this.isShowingDeleteOverlay = false;
