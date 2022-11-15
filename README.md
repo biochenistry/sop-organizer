@@ -1,6 +1,6 @@
 # SOP Organizer 2
 
-Access the SOP Organizer at [coms-402-sd-41.class.las.iastate.edu](http://coms-402-sd-41.class.las.iastate.edu)
+Access the SOP Organizer at [coms-402-sd-41.class.las.iastate.edu:8443](http://coms-402-sd-41.class.las.iastate.edu:8443)
 
 
 ### Frontend

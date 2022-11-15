@@ -15,7 +15,8 @@ cleanup:
     - sudo rm -rf /home/gitlab-runner/builds/*
     - sudo chown -R gitlab-runner /home/gitlab-runner/builds/
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
+
 
 backend-build:
   stage: backendtry
@@ -31,7 +32,7 @@ backend-build:
     - npm install
     - pm2 --name "server_backend" start npm -- start
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"
 
 frontend-build:
   stage: frontendtry
@@ -48,8 +49,8 @@ frontend-build:
     - pm2 status
     - cd frontend
     - npm set-script prepare ''
-    - sudo npm install
-    - sudo npm run build
-    - pm2 start
+    - npm install
+    - npm run generate
+    - pm2 --name "server_frontend" start npm -- start
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"

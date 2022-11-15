@@ -56,7 +56,7 @@ export default {
   build: {},
   srcDir: 'src',
   server: {
-    port: process.env.NUXT_ENV_PORT || '80', // requires sudo to start
+    port: process.env.NUXT_ENV_PORT || '8443',
     host: '0.0.0.0',
     timing: false,
   },
