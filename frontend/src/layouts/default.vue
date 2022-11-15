@@ -348,10 +348,11 @@ export default defineComponent({
     checkAuthentication() {
       if (window.localStorage.getItem('accessToken')) {
         this.username = window.localStorage.getItem('username');
-        this.email = window.localStorage.getItem('email');
-        this.isAdmin = window.localStorage.getItem('isAdmin') === 'true';
+        // this.email = window.localStorage.getItem('email');
+        // this.isAdmin = window.localStorage.getItem('isAdmin') === 'true';
         this.isLoggedIn = true;
         this.isLoggingIn = false;
+        this.isAdmin = window.localStorage.getItem('isAdmin');
         window.localStorage.setItem('isLoggedIn', this.isLoggedIn);
       }
     },
