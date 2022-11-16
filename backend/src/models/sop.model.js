@@ -1,6 +1,8 @@
 import sql from './db.js';
 import fs from 'fs';
 import fsExtra from 'fs-extra';
+import path from 'path';
+import Document from './document.model.js';
 
 const STORAGE_DIR = `${process.env.PROJECT_PATH}/sop-files`;
 
@@ -185,4 +187,57 @@ SOP.changeDirectory = (sop_id, oldDirectory, newDirectory, resultCallback) => {
     );
   });
 };
+
+// helper function - recursively finds all files in `directory` that contain `content` string
+const getFilesWithContent = (directory, content) => {
+  content = content.toLowerCase();
+  const folderContents = fs.readdirSync(directory);
+
+  let filesWithContent = [];
+
+  for (const item of folderContents) {
+    const itemPath = `${directory}/${item}`;
+    const itemStat = fs.statSync(path.resolve(itemPath));
+    if (itemStat.isDirectory()) {
+      filesWithContent = filesWithContent.concat(getFilesWithContent(itemPath, content));
+      continue;
+    }
+    else if (itemPath.endsWith('.docx')) {
+      continue;
+    }
+    
+    const fileContents = fs.readFileSync(itemPath, 'utf-8');
+    // console.log(fileContents);
+    
+    if (fileContents.toLowerCase().includes(content)) {
+      filesWithContent.push(itemPath);
+    }
+  }
+
+  return filesWithContent;
+};
+
+
+SOP.getAllByFileContent = (searchTerm, resultCallback) => {
+  const filesIncludingContent = getFilesWithContent(STORAGE_DIR, searchTerm);
+  const filteredSOPs = [];
+
+  Document.getAll((err, res) => {
+    if (err) {
+      resultCallback(err, null);
+      return;
+    }
+
+    filesIncludingContent.forEach((file) => {
+      const matchingDBEntry = res.find(({ location, version_number }) => path.resolve(file) === path.resolve(`${STORAGE_DIR}/${location}/${version_number}.html`));
+      if (matchingDBEntry) { 
+        filteredSOPs.push(matchingDBEntry);
+      }
+    });
+    resultCallback(undefined, filteredSOPs);
+    return;
+  });
+};
+
 export default SOP;
+

@@ -75,6 +75,37 @@ const getAll = (req, res) => {
   });
 };
 
+const getAllFilteredByContent = (req, res) => {
+  SOP.getAllByFileContent(req.params.searchTerm, (err, sops) => {
+    if (err) {
+      res.status(500).send({
+        message: 'An error occurred while fetching SOPs.',
+      });
+      return;
+    }
+
+    // Simply return the SOPs if the user didn't ask for the documents to be included
+    if (req.query.include_documents !== 'true') {
+      res.send(sops);
+      return;
+    }
+
+    // TODO - change this to use a filter (by sop id) later
+    Document.getAll((err, documents) => {
+      if (err) {
+        res.status(500).send({
+          message: 'An error occurred while fetching documents.',
+        });
+      }
+
+      for (const sop of sops) {
+        sop.documents = documents.filter(({ sop_id }) => sop_id === sop.id);
+      }
+      res.send(sops); 
+    });
+  });
+}
+
 const getById = (req, res) => {
   SOP.getById(req.params.id, (err, sop) => {
     if (err) {
@@ -150,4 +181,4 @@ const changeDirectory = (req, res) => {
 //   });
 // };
 
-export default { create, getAll, getById, update, changeDirectory };
+export default { create, getAll, getById, update, changeDirectory, getAllFilteredByContent };
