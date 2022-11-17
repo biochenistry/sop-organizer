@@ -32,3 +32,14 @@ export async function updateUserPriv(user_id: Number, user: User): Promise<void>
     throw new Error(res.statusText);
   }
 }
+
+export async function deleteUser(credentials): Promise<void> {
+  const res = await fetch(`${BASE_URL}/users/`, {
+    method: 'DELETE',
+    body: JSON.stringify(credentials),
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+}

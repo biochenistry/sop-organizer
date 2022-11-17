@@ -138,16 +138,17 @@
           </div>
         </v-list-item>
         <v-list-item v-if="!isLoggedIn" class="mx-auto">
-          <v-btn v-if="isAdmin" align-center @click="showRegModal = true">
+          <!-- Change this: This button is visible if route is "/register" or something -->
+          <v-btn align-center @click="showRegModal = true">
             Register User
           </v-btn>
         </v-list-item>
-        <v-list-item v-if="isLoggedIn && isAdmin" class="mx-auto">
+        <v-list-item v-if="isLoggedIn" class="mx-auto">
           <v-btn align-center @click="showDirModal = true">
             Create Directory
           </v-btn>
         </v-list-item>
-        <v-list-item v-if="isLoggedIn && isAdmin" class="mx-auto">
+        <v-list-item v-show="isAdmin" class="mx-auto">
           <v-btn align-center @click="showPrivModal = true">Edit Privileges</v-btn>
         </v-list-item>
         <v-list-item class="mx-auto">
@@ -192,7 +193,7 @@
       @revertChanges="revertChanges"
       @clearDirectoryChangeModal="showDirectoryChangeModal = false"
     />
-    <PrivilegeModal v-if="showPrivModal" @clearPrivModal="showPrivModal = false"/>
+    <PrivilegeModal v-if="showPrivModal" @clearPrivModal="showPrivModal = false" :email-prop="email"/>
     <CreateSopModal
       v-if="showCreateSopModal"
       :initial-form-data="formData"
@@ -248,7 +249,8 @@ export default defineComponent({
     return {
       isSidebarVisible: true,
       isLoggedIn: false,
-      isAdmin: true, // TODO - change this default to false, only change after check with database
+      isAdmin: false, // TODO - change this default to false, only change after check with database
+      email: '',
       showRegModal: false,
       isLoggingIn: false,
       showDirModal: false,
@@ -289,11 +291,11 @@ export default defineComponent({
     },
   },
   mounted() {
+    this.updateDocuments();
+    this.checkAuthentication();
     this.$root.$on('refresh', () => {
       this.updateDocuments();
-    }),
-      this.updateDocuments();
-    this.checkAuthentication();
+    })
   },
   methods: {
     updateDocuments() {
@@ -331,7 +333,6 @@ export default defineComponent({
                 this.directories = directories;
               })
               .finally(() => {
-                console.log('finally');
                 this.isLoading = false;
               });
           });
@@ -347,14 +348,22 @@ export default defineComponent({
     checkAuthentication() {
       if (window.localStorage.getItem('accessToken')) {
         this.username = window.localStorage.getItem('username');
-        this.isLoggedIn = true;
+        this.email = window.localStorage.getItem('email');
+        this.isAdmin = window.localStorage.getItem('isAdmin') === 'true';
+        this.isLoggedIn = true
         this.isLoggingIn = false;
-        // window.localStorage.setItem('isLoggedIn', this.isLoggedIn);
+        this.isAdmin = window.localStorage.getItem('isAdmin');
+        window.localStorage.setItem('isLoggedIn', this.isLoggedIn);
+        this.$root.$emit('authChange');
       }
     },
     logout() {
       window.localStorage.clear();
       this.isLoggedIn = false;
+      this.username = '';
+      this.email = '';
+      this.isAdmin = ''; 
+      this.$root.$emit('authChange');
     },
     handleChanges(event, list, directory) {
       this.directoryChanges.push({
@@ -466,7 +475,7 @@ export default defineComponent({
     },
     removeExtension(str){
       return str.replace(/\.[^/.]+$/, "");
-    }
+    },
   },
 });
 </script>

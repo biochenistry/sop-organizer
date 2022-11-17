@@ -2,9 +2,8 @@ import { User } from '../types/index';
 
 const BASE_URL = process.env.NUXT_ENV_API_URL;
 
-export async function registerUser(credentials): Promise<void> {
-  console.log(credentials);
-  const res = await fetch(`${BASE_URL}/auth/register`, {
+export async function preregisterUser(credentials): Promise<void> {
+  const res = await fetch(`${BASE_URL}/auth/preregister`, {
     method: 'POST',
     body: JSON.stringify(credentials),
     headers: { 'Content-Type': 'application/json' },
@@ -12,6 +11,16 @@ export async function registerUser(credentials): Promise<void> {
   if (!res.ok) {
     throw new Error(res.statusText);
   }
+}
+
+export async function registerUser(credentials): Promise<Response> {
+  console.log(credentials);
+  const res = await fetch(`${BASE_URL}/auth/register`, {
+    method: 'POST',
+    body: JSON.stringify(credentials),
+    headers: { 'Content-Type': 'application/json' },
+  });
+  return res;
 }
 
 export async function login(credentials): Promise<void> {

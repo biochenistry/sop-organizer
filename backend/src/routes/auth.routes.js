@@ -9,6 +9,8 @@ const AuthRoutes = (app) => {
 
   router.post('/signout', auth.signout);
 
+  router.post('/preregister', auth.preregister);
+
   router.post('/register', auth.register);
 
   router.post('/perms', jwt.verifyToken, jwt.isAdmin, auth.changePermission);

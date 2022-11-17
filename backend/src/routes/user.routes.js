@@ -8,6 +8,7 @@ const UserRoutes = (app) => {
   router.get('/:id', users.getById);
   router.post('/', users.create);
   router.patch('/:id', users.update);
+  router.delete('/', users.deleteUser);
 
   app.use('/users', router);
 };

@@ -96,15 +96,25 @@ export default defineComponent({
         email: this.email,
         password: this.password,
       })
-        .then(() => {
-          this.isShowingSuccessMessage = true;
+        .then((status) => {
+          if(status.status === 200){
+            this.isShowingSuccessMessage = true;
+          }
+          else if(status.status === 403) {
+            this.errorMessage = "This email is already registered.";
+          }
+          else if(status.status === 409) {
+            this.errorMessage = "An admin must preregister your email.";
+          }
+          else {
+            this.errorMessage = status.statusText;
+          }
           setTimeout(() => {
-            this.$emit('clearRegModal');
+            // this.$emit('clearRegModal');
           }, 7500);
         })
         .catch((err) => {
           console.log('error', err);
-          this.errorMessage = err.message;
         })
         .finally(() => {
           this.isLoading = false;

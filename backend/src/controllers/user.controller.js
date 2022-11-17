@@ -67,4 +67,16 @@ const getById = (req, res) => {
   });
 };
 
-export default { create, getAll, getById, update };
+const deleteUser = (req, res) => {
+  User.deleteUser(req.body.email, (err, user) => {
+    if (err) {
+      res.status(500).send({
+        message: 'An error occurred while deleting the user.',
+      });
+      return;
+    }
+    res.send(user);
+  });
+};
+
+export default { create, getAll, getById, update, deleteUser };
