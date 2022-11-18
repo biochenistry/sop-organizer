@@ -85,7 +85,7 @@ export default defineComponent({
     createSop(directoryName) {
       this.fileData = new FormData();
       this.fileData.append('directory_name', directoryName);
-      this.fileData.append('editor_id', 1); // placeholder for now
+      this.fileData.append('editor_id', window.localStorage.getItem('id'));
       this.$emit('emitOpenCreateSopModal', this.fileData);
     },
     deleteDirectory(id){
@@ -93,7 +93,7 @@ export default defineComponent({
     },
     uploadFile() {
       this.fileData.append('directory_name', this.selectedDirectoryName);
-      this.fileData.append('editor_id', 1); // placeholder for now
+      this.fileData.append('editor_id', window.localStorage.getItem('id'));
       this.isLoading = true;
 
       uploadNew(this.fileData)

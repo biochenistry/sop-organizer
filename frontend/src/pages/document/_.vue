@@ -67,6 +67,9 @@
         <v-card-subtitle>
           Original filename: {{ removeExtension(document.original_file_name) }}
         </v-card-subtitle>
+        <v-card-subtitle>
+          Editor: {{ editor.name }} <a v-bind:href="`mailto:${editor.email}`">({{ editor.email }})</a>
+        </v-card-subtitle>
         <v-card-subtitle v-if="deleter" class="font-weight-bold">
           Marked for deletion by user: {{ deleter.name }}
         </v-card-subtitle>
@@ -216,7 +219,7 @@ export default {
     const isAdmin = window.localStorage.getItem('isAdmin') === 'true';
     const isLoggedIn = window.localStorage.getItem('isLoggedIn') === 'true';
 
-    let sop, document, file, selectedVersion, versions, deleter, newName;
+    let sop, document, file, selectedVersion, versions, deleter, newName, editor;
     try {
       document = await getDocument(documentId);
       sop = await getSOP(document.sop_id);
@@ -234,6 +237,7 @@ export default {
       selectedVersion = document;
       selectedVersion.version_number =
         'Version ' + selectedVersion.version_number;
+      editor = await getUser(document.editor_id)
     } catch (err) {
       error({
         statusCode: 500,
@@ -252,6 +256,7 @@ export default {
       newName,
       isAdmin,
       isLoggedIn,
+      editor
     };
   },
   data() {
@@ -373,7 +378,7 @@ export default {
     },
     updateExistingDocument() {
       this.fileData.append('sop_id', this.document.sop_id);
-      this.fileData.append('editor_id', 1);
+      this.fileData.append('editor_id', window.localStorage.getItem('id'));
       this.fileData.append(
         'directory_name',
         this.document.location.split('/')[0]

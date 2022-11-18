@@ -97,7 +97,7 @@ export default defineComponent({
       });
       this.fileData.append('file', file);
       this.fileData.append('sop_id', this.document.sop_id);
-      this.fileData.append('editor_id', 1);
+      this.fileData.append('editor_id', window.localStorage.getItem('id'));
       this.fileData.append(
         'directory_name',
         this.document.location.split('/')[0]
