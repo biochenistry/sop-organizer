@@ -38,6 +38,7 @@ const signin = (req, res) => {
               msg: 'Logged in.',
               token,
               user: {
+                id: result[0].id,
                 name: result[0].name,
                 email: result[0].email,
                 privilege: result[0].privilege,

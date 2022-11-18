@@ -38,4 +38,5 @@ export async function login(credentials): Promise<void> {
   window.localStorage.setItem('username', user.name);
   window.localStorage.setItem('email', user.email);
   window.localStorage.setItem('isAdmin', `${user.privilege.data[0] === 1}`);
+  window.localStorage.setItem('id', user.id);
 }
