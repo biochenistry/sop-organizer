@@ -9,7 +9,7 @@ create table if not exists sop_database.users (
     name varchar(255),
     email varchar(255) NOT NULL unique,
     password varchar(255),
-    privilege bit NOT NULL default 0,
+    privilege BOOLEAN NOT NULL default 0,
     PRIMARY KEY (id)
 );
 
