@@ -23,7 +23,8 @@ export interface SOP {
 
 export interface User {
   id: Number;
+  email: String,
   name: String;
-  privileges: Boolean;
+  privilege: Boolean;
   password?: String;
 }

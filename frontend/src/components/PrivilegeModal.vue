@@ -42,12 +42,12 @@
             <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
           </v-list-item-title>
           <v-switch disabled v-if="emailProp === user.email" input-value="true"></v-switch>
-          <v-switch v-else-if="user.privilege.data !== undefined && user.privilege.data[0] === 1"
-            v-model="user.privilege.data !== undefined && user.privilege.data[0] === 1"
+          <v-switch v-else-if="user.privilege !== undefined && user.privilege === 1"
+            v-model="user.privilege !== undefined && user.privilege === 1"
             @click="revokeAccess(user)">
           </v-switch>
-          <v-switch v-else-if="user.name !== 'Not registered' && user.privilege.data !== undefined && user.privilege.data[0] === 0"
-          v-model="user.privilege.data !== undefined && user.privilege.data[0] === 1"
+          <v-switch v-else-if="user.name !== 'Not registered' && user.privilege !== undefined && user.privilege === 0"
+          v-model="user.privilege !== undefined && user.privilege === 1"
           @click="grantAccess(user)"></v-switch>
         </v-list-item>
       </v-list>
@@ -93,8 +93,11 @@ export default defineComponent({
         })
     },
     grantAccess(user: User){
-      updateUserPriv(user.id, user)
+      let newUserPrivileges = JSON.parse(JSON.stringify(user));
+      newUserPrivileges.privilege = 1;
+      updateUserPriv(user.id, newUserPrivileges)
         .then(() => {
+          this.grabUsers();
           this.refresh();
         })
         .catch((err) => {
@@ -102,8 +105,11 @@ export default defineComponent({
         });
     },
     revokeAccess(user: User){
-      updateUserPriv(user.id, user)
+      let newUserPrivileges = JSON.parse(JSON.stringify(user));
+      newUserPrivileges.privilege = 0;
+      updateUserPriv(user.id, newUserPrivileges)
         .then(() => {
+          this.grabUsers();
           this.refresh();
         })
         .catch((err) => {
