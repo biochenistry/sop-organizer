@@ -50,9 +50,16 @@
 
               <v-list-item
                 v-if="isAdmin && versions.length > 1"
-                @click="isShowingAdminDeleteOverlay = true"
+                @click="isShowingAdminDeleteVersionOverlay = true"
               >
                 Delete version<v-icon>mdi-trash-can</v-icon>
+              </v-list-item>
+
+              <v-list-item
+                v-if="isAdmin"
+                @click="isShowingAdminDeleteSopOverlay = true"
+              >
+                Delete SOP<v-icon>mdi-trash-can</v-icon>
               </v-list-item>
 
               <v-list-item v-if="isLoggedIn" @click="isShowingRenameOverlay = true">
@@ -124,8 +131,8 @@
           </v-card>
         </v-overlay>
 
-        <v-overlay :value="isShowingAdminDeleteOverlay" :z-index="100">
-          <v-card v-click-outside="closeAdminDeleteModal" class="pa-4 d-" light>
+        <v-overlay :value="isShowingAdminDeleteVersionOverlay" :z-index="100">
+          <v-card v-click-outside="closeAdminDeleteVersionModal" class="pa-4 d-" light>
             <v-responsive
               min-width="300px"
               width="40vw"
@@ -141,11 +148,48 @@
                 </span>
               </V-card-text>
               <v-card-actions class="justify-space-between">
-                <v-btn @click="closeAdminDeleteModal">Cancel</v-btn>
+                <v-btn @click="closeAdminDeleteVersionModal">Cancel</v-btn>
                 <v-btn
                   v-if="!isAwaitingAdminDeletionCall"
                   color="primary"
-                  @click="adminDeleteDoc"
+                  @click="adminDeleteVersion"
+                  >Delete</v-btn
+                >
+                <v-progress-circular
+                  v-if="isAwaitingAdminDeletionCall"
+                  indeterminate
+                  :size="40"
+                  :width="4"
+                  color="primary"
+                  class="mr-4"
+                ></v-progress-circular>
+              </v-card-actions>
+            </v-responsive>
+          </v-card>
+        </v-overlay>
+
+        <v-overlay :value="isShowingAdminDeleteSopOverlay" :z-index="100">
+          <v-card v-click-outside="closeAdminDeleteSopModal" class="pa-4 d-" light>
+            <v-responsive
+              min-width="300px"
+              width="40vw"
+              max-width="600px"
+              class="d-flex flex-column pa-4"
+            >
+              <v-card-title>Deletion Confirmation</v-card-title>
+              <V-card-text>
+                <span class="text-body-1">
+                  Are you sure that you want to delete
+                  <strong>{{ removeExtension(sop.name) }}</strong
+                  >?
+                </span>
+              </V-card-text>
+              <v-card-actions class="justify-space-between">
+                <v-btn @click="closeAdminDeleteSopModal">Cancel</v-btn>
+                <v-btn
+                  v-if="!isAwaitingAdminDeletionCall"
+                  color="primary"
+                  @click="adminDeleteSop"
                   >Delete</v-btn
                 >
                 <v-progress-circular
@@ -264,7 +308,8 @@ export default {
       isShowingDeleteOverlay: false,
       isShowingRenameOverlay: false,
       isAwaitingDeletionCall: false,
-      isShowingAdminDeleteOverlay: false,
+      isShowingAdminDeleteVersionOverlay: false,
+      isShowingAdminDeleteSopOverlay: false,
       isAwaitingAdminDeletionCall: false,
       isAwaitingRenameCall: false,
       versions: [],
@@ -309,10 +354,13 @@ export default {
           this.isAwaitingDeletionCall = false;
         });
     },
-    closeAdminDeleteModal() {
-      this.isShowingAdminDeleteOverlay = false;
+    closeAdminDeleteVersionModal() {
+      this.isShowingAdminDeleteVersionOverlay = false;
     },
-    async adminDeleteDoc() {
+    closeAdminDeleteSopModal() {
+      this.isShowingAdminDeleteSopOverlay = false;
+    },
+    async adminDeleteVersion() {
       this.isAwaitingAdminDeletionCall = true;
       deleteDocument(this.documentId)
         .then(async (latestDocument) => {
@@ -322,7 +370,7 @@ export default {
               'Version ' + doc_version.version_number;
           });
           this.$router.push(`/document/${latestDocument.id}`);
-          this.closeAdminDeleteModal();
+          this.closeAdminDeleteVersionModal();
         })
         .catch((err) => {
           this.error({
@@ -334,6 +382,25 @@ export default {
         .finally(() => {
           this.isAwaitingAdminDeletionCall = false;
         });
+    },
+    async adminDeleteSop() {
+      this.isAwaitingAdminDeletionCall = true;
+      // placeholder for now
+      // deleteSop(this.sop.id)
+      //   .then(async () => {
+      //     this.$router.push(`/`);
+      //     this.closeAdminDeleteSopModal();          
+      //   })
+      //   .catch((err) => {
+      //     this.error({
+      //       statusCode: 500,
+      //       message: 'Something went wrong while deleting the sop.',
+      //       error: err,
+      //     });
+      //   })
+      //   .finally(() => {
+      //     this.isAwaitingAdminDeletionCall = false;
+      //   });
     },
     onVersionChange(event) {
       this.$router.push(`/document/${event.id}`);
