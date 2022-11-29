@@ -1,4 +1,5 @@
 import Directory from '../models/directory.model.js';
+import SOP from '../models/sop.model.js';
 
 const create = (req, res) => {
   if (!req.body) {
@@ -25,14 +26,46 @@ const create = (req, res) => {
 };
 
 const getAll = (req, res) => {
-  Directory.getAll((err, data) => {
+  Directory.getAll((err, directories) => {
     if (err) {
       res.status(500).send({
         message: 'An error occurred while fetching directories.',
       });
-    } else {
-      res.send(data);
+      return;
     }
+
+    // Simply return the directories if the user didn't ask for the SOPs to be included
+    if (req.query.include_sops !== 'true') {
+      res.send(directories);
+      return;
+    }
+
+    Directory.getAllSOPLinks((err, directory_sop_links) => {
+      if (err) {
+        res.status(500).send({
+          message: 'An error occurred while fetching documents.',
+        });
+        return;
+      }
+
+      SOP.getAll((err, sops) => {
+        if (err) {
+          res.status(500).send({
+            message: 'An error occurred while fetching documents.',
+          });
+        }
+  
+        console.log(directory_sop_links);
+        directories.forEach((dir) => {
+          dir.sops = sops.filter((sop) =>
+            directory_sop_links.find(({ directory_id, sop_id }) =>
+              dir.id == directory_id && sop.id == sop_id
+            ));
+        });
+        res.send(directories);
+      });
+    });
+
   });
 };
 
