@@ -3,11 +3,19 @@ import { Directory } from '../types/index';
 const BASE_URL = process.env.NUXT_ENV_API_URL;
 
 export async function getDirectories(includeSops=true): Promise<Array<any>> {
-  const res = await fetch(`${BASE_URL}/directory?include_sops=${includeSops}`);
+  let res = await fetch(`${BASE_URL}/directory?include_sops=${includeSops}`);
+  if (!res.ok) {
+    try {
+      res = await fetch(`${BASE_URL}/directory?include_sops=false`);
+    }
+    catch {
+      throw new Error(res.statusText);
+    }
+  }
   if (!res.ok) {
     throw new Error(res.statusText);
   }
-
+  
   const directories: Array<any> = await res.json();
   return directories;
 };
