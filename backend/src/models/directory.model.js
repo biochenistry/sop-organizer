@@ -89,7 +89,6 @@ Directory.getSopsIdsByDirectoryId = (id, resultCallback) => {
 };
 
 Directory.deleteById = (id, resultCallback)=> {
-  console.log(id);
   sql.query('DELETE FROM directories WHERE id = ? LIMIT 1', [id], (err, res) => {
     if (err) {
       console.log(`Error: ${err.message}`);
@@ -100,9 +99,7 @@ Directory.deleteById = (id, resultCallback)=> {
       resultCallback(err, null);
       return;
     }
-
-    if (!res.length) return resultCallback(new Error('Directory not found'), null);
-    resultCallback(undefined, JSON.parse(JSON.stringify(res[0])));
+    resultCallback(undefined, res);
   });
 };
 
