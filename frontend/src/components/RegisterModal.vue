@@ -59,7 +59,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { registerUser } from '~/services/auth';
+import { registerUser, preregisterUser } from '~/services/auth';
+import { getUsers, updateUserPriv } from '~/services/users';
 
 export default defineComponent({
   name: 'RegisterModal',
@@ -91,34 +92,75 @@ export default defineComponent({
     },
     register() {
       this.isLoading = true;
-      registerUser({
-        name: this.name,
-        email: this.email,
-        password: this.password,
-      })
-        .then((status) => {
-          if(status.status === 200){
-            this.isShowingSuccessMessage = true;
-          }
-          else if(status.status === 403) {
-            this.errorMessage = "This email is already registered.";
-          }
-          else if(status.status === 409) {
-            this.errorMessage = "An admin must preregister your email.";
+      getUsers()
+        .then((users) => {
+          if (users.length === 0) {
+            preregisterUser({email: this.email})
+              .then(() => {
+                registerUser({
+                  name: this.name,
+                  email: this.email,
+                  password: this.password,
+                })
+                  .then((status) => {
+                    if(status.status === 200) {
+                      getUsers()
+                        .then((users) => {
+                          let user = users[0];
+                          let newUserPrivileges = JSON.parse(JSON.stringify(user));
+                          newUserPrivileges.privilege = 1;
+                          updateUserPriv(user.id, newUserPrivileges)
+                            .then(() => {
+                              this.isShowingSuccessMessage = true;
+                            })
+                        })
+                    }
+                    else {
+                      this.errorMessage = status.statusText;
+                    }
+                    setTimeout(() => {
+                      this.$emit('clearRegModal');
+                    }, 7500);
+                  })
+                  .catch((err) => {
+                    console.log('error', err);
+                  })
+                  .finally(() => {
+                    this.isLoading = false;
+                  });                             
+              })
           }
           else {
-            this.errorMessage = status.statusText;
+            registerUser({
+              name: this.name,
+              email: this.email,
+              password: this.password,
+            })
+              .then((status) => {
+                if(status.status === 200) {
+                  this.isShowingSuccessMessage = true;
+                }
+                else if(status.status === 403) {
+                  this.errorMessage = "This email is already registered.";
+                }
+                else if(status.status === 409) {
+                  this.errorMessage = "An admin must preregister your email.";
+                }
+                else {
+                  this.errorMessage = status.statusText;
+                }
+                setTimeout(() => {
+                  this.$emit('clearRegModal');
+                }, 7500);
+              })
+              .catch((err) => {
+                console.log('error', err);
+              })
+              .finally(() => {
+                this.isLoading = false;
+              });
           }
-          setTimeout(() => {
-            // this.$emit('clearRegModal');
-          }, 7500);
         })
-        .catch((err) => {
-          console.log('error', err);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
     },
   },
 });
