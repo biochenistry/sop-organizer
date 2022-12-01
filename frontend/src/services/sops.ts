@@ -75,4 +75,14 @@ export async function rename(
   if (!res.ok) {
     throw new Error(res.statusText);
   }
-}
+};
+
+export async function getAllSOPsWithContent(content: String): Promise<Array<SOP>> {
+  const res = await fetch(`${BASE_URL}/sops/search/${content}`);
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+
+  const documents: Array<SOP> = await res.json();
+  return documents;
+};

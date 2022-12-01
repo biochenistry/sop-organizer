@@ -21,23 +21,36 @@
               placeholder="Search title"
             ></v-text-field>
           </v-col>
-          <v-col :cols="4">
-            <v-btn
-              v-if="isSorted"
-              small
-              @click="
-                isSorted = false;
-                isSortedByDate = false;
-                isSortedByAlphabetical = false;
-              "
-            >
-              Unsort
-            </v-btn>
-            <v-menu v-if="!isSorted" offset-y>
+          <v-col :cols="1">
+            <v-menu offset-y>
+              <template #activator="{ on, attrs }">
+                <v-icon v-bind="attrs" v-on="on">
+                mdi-cog-outline
+                </v-icon>
+              </template>
+              <v-list>
+                <v-list-item @click="showSearchContentModal = true;">
+                  Search by content
+                  <v-icon>mdi-star</v-icon>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-col>
+          <v-col :cols="3">
+            <v-menu offset-y>
               <template #activator="{ on, attrs }">
                 <v-btn small v-bind="attrs" v-on="on"> Sort </v-btn>
               </template>
               <v-list>
+                <v-list-item
+                  @click="
+                    isSorted = false;
+                    isSortedByDate = false;
+                    isSortedByAlphabetical = false;
+                  "
+                >
+                  Unsorted
+                </v-list-item>
                 <v-list-item @click="sortByDate(-1)">
                   Date <v-icon>mdi-arrow-up</v-icon>
                 </v-list-item>
@@ -199,6 +212,7 @@
       :initial-form-data="formData"
       @emitCloseCreateSopModal="showCreateSopModal = false"
     />
+    <SearchContentModal v-if="showSearchContentModal" @closeModal="showSearchContentModal = false" />
   </v-app>
 </template>
 
@@ -206,6 +220,7 @@
 import { defineComponent } from 'vue';
 import draggable from 'vuedraggable';
 import LoginModal from '@/components/LoginModal.vue';
+import SearchContentModal from '@/components/SearchContentModal.vue';
 import RegisterModal from '@/components/RegisterModal.vue';
 import DirectoryModal from '@/components/DirectoryModal.vue';
 import DirectoryChangeModal from '@/components/DirectoryChangeModal.vue';
@@ -227,6 +242,7 @@ interface State {
   showRegModal: boolean;
   showDirModal: boolean;
   showDirectoryChangeModal: boolean;
+  showSearchContentModal: boolean;
   showPrivModal: boolean;
   showCreateSopModal: boolean;
   title: String;
@@ -255,6 +271,7 @@ export default defineComponent({
       isLoggingIn: false,
       showDirModal: false,
       showDirectoryChangeModal: false,
+      showSearchContentModal: false,
       showPrivModal: false,
       showCreateSopModal: false,
       isLoading: true,
