@@ -369,7 +369,6 @@ export default defineComponent({
         this.isAdmin = window.localStorage.getItem('isAdmin') === 'true';
         this.isLoggedIn = true
         this.isLoggingIn = false;
-        this.isAdmin = window.localStorage.getItem('isAdmin');
         window.localStorage.setItem('isLoggedIn', this.isLoggedIn);
         this.$root.$emit('authChange');
       }

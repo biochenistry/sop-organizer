@@ -5,7 +5,7 @@
         <v-col cols="1" align="left" align-self="center"
           ><v-icon>mdi-folder-open</v-icon></v-col
         >
-        <v-col cols="1" align="left" align-self="center">
+        <v-col cols="8" align="left" align-self="center" style="max-width:200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">                              
           {{ directoryName }}
         </v-col>
         <v-col v-if="isLoggedIn" align="right" align-self="center">

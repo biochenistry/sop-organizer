@@ -153,6 +153,23 @@ const changeDirectory = (req, res) => {
   );
 };
 
+const deleteSop = (req, res) => {
+  SOP.delete(
+    req.body.sop_id,
+    req.body.directory_name,
+    (err) => {
+      if (err) {
+        res.status(500).send({
+          message: 'An error occurred while deleting the SOP.',
+        });
+        return;
+      } else {
+        res.sendStatus(201);
+      }
+    }
+  );
+};
+
 // const getByName = (req, res) => {
 //   SOP.getByName(req.params.name, (err, sop) => {
 //     if (err) {
@@ -181,4 +198,4 @@ const changeDirectory = (req, res) => {
 //   });
 // };
 
-export default { create, getAll, getById, update, changeDirectory, getAllFilteredByContent };
+export default { create, getAll, getById, update, changeDirectory, getAllFilteredByContent, deleteSop };
