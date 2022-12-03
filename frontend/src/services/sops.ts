@@ -86,3 +86,25 @@ export async function getAllSOPsWithContent(content: String): Promise<Array<SOP>
   const documents: Array<SOP> = await res.json();
   return documents;
 };
+
+export async function deleteSop(
+  sop_id: Number,
+  directory_name: String,
+): Promise<void> {
+  const body = {
+    sop_id,
+    directory_name,
+  };
+  console.log(`Body: ${body}`);
+  const res = await fetch(`${BASE_URL}/sops/`, {
+    method: 'DELETE',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+}

@@ -10,6 +10,7 @@ const SOPRoutes = (app) => {
   router.patch('/:id', sops.update);
   router.get('/search/:searchTerm', sops.getAllFilteredByContent);
   router.post('/changeDirectory', sops.changeDirectory);
+  router.delete('/', sops.deleteSop)
 
   app.use('/sops', router);
 };

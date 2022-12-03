@@ -56,7 +56,7 @@
               </v-list-item>
 
               <v-list-item
-                v-if="isAdmin"
+                v-if="(isAdmin && this.document.marked_for_deletion_by_user_id !== null)"
                 @click="isShowingAdminDeleteSopOverlay = true"
               >
                 Delete SOP<v-icon>mdi-trash-can</v-icon>
@@ -253,7 +253,7 @@ import {
   downloadDocument,
 } from '~/services/documents';
 import { getFile } from '~/services/files';
-import { getSOP, rename } from '~/services/sops';
+import { getSOP, rename, deleteSop } from '~/services/sops';
 import { getUser } from '~/services/users';
 
 export default {
@@ -385,22 +385,22 @@ export default {
     },
     async adminDeleteSop() {
       this.isAwaitingAdminDeletionCall = true;
-      // placeholder for now
-      // deleteSop(this.sop.id)
-      //   .then(async () => {
-      //     this.$router.push(`/`);
-      //     this.closeAdminDeleteSopModal();          
-      //   })
-      //   .catch((err) => {
-      //     this.error({
-      //       statusCode: 500,
-      //       message: 'Something went wrong while deleting the sop.',
-      //       error: err,
-      //     });
-      //   })
-      //   .finally(() => {
-      //     this.isAwaitingAdminDeletionCall = false;
-      //   });
+      deleteSop(this.sop.id, this.document.location.split('/')[0])
+        .then(async () => {
+          this.$router.push(`/`);
+          this.closeAdminDeleteSopModal();  
+          this.$root.$emit('refresh');
+        })
+        .catch((err) => {
+          this.error({
+            statusCode: 500,
+            message: 'Something went wrong while deleting the sop.',
+            error: err,
+          });
+        })
+        .finally(() => {
+          this.isAwaitingAdminDeletionCall = false;
+        });
     },
     onVersionChange(event) {
       this.$router.push(`/document/${event.id}`);

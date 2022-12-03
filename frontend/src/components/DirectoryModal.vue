@@ -40,7 +40,7 @@ export default defineComponent({
     },
 
     validatateDirectory() {
-      const regex = /^[a-zA-Z0-9-]*$/;
+      const regex = /^[\w\-\s]+$/;
       return regex.test(this.name);
     },
 

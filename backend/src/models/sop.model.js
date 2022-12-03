@@ -5,6 +5,7 @@ import path from 'path';
 import Document from './document.model.js';
 
 const STORAGE_DIR = `${process.env.PROJECT_PATH}/sop-files`;
+const TRASH_DIR = `${process.env.PROJECT_PATH}/sop-trash/`;
 
 const SOP = function (sop) {
   this.name = sop.name;
@@ -239,5 +240,57 @@ SOP.getAllByFileContent = (searchTerm, resultCallback) => {
   });
 };
 
+SOP.delete = (sop_id, directory_name, resultCallback) => {
+  sql.query(
+    'DELETE FROM documents WHERE sop_id = ?',
+    [sop_id],
+    (err) => {
+      if (err) {
+        if (err.sqlMessage) {
+          console.log(`SQL Error: ${err.sqlMessage}`);
+        } else console.log(`Error: ${err.message}`);
+        resultCallback(err);
+        return;
+      }
+      sql.query(
+        'DELETE FROM directory_sop WHERE sop_id = ?',
+        [sop_id],
+        (err) => {
+          if (err) {
+            if (err.sqlMessage) {
+              console.log(`SQL Error: ${err.sqlMessage}`);
+            } else console.log(`Error: ${err.message}`);
+            resultCallback(err);
+            return;
+          }
+          sql.query(
+        'DELETE FROM sops WHERE id = ?',
+            [sop_id],
+            (err) => {
+              if (err) {
+                if (err.sqlMessage) {
+                  console.log(`SQL Error: ${err.sqlMessage}`);
+                } else console.log(`Error: ${err.message}`);
+                resultCallback(err);
+                return;
+              }
+              const oldSopDir = `${STORAGE_DIR}/${directory_name}/${sop_id}/`
+              const newSopDir = `${TRASH_DIR}/${directory_name}/${sop_id}/`
+              fsExtra.move(oldSopDir, newSopDir, { overwrite: true }, (err) => {
+                if (err) {
+                  console.log('Error changing SOP directory');
+                  resultCallback(err);
+                }
+                resultCallback(undefined, null);
+                return;
+              })
+            }
+          )
+        }
+      );
+    }
+  );
+}
+  
 export default SOP;
 
