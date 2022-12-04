@@ -31,6 +31,7 @@
                 <input
                   ref="uploadFile"
                   type="file"
+                  accept=".docx"
                   hidden
                   @change="rememberFileSelectionUpload"
                 />
@@ -40,6 +41,11 @@
         </v-col>
       </v-row>
     </v-container>
+    <ErrorModal
+      v-if="showErrorModal"
+      :error-message="errorMessage"
+      @emitCloseErrorModal="showErrorModal = false"
+    />
   </div>
 </template>
 
@@ -62,6 +68,8 @@ export default defineComponent({
     isLoading: false,
     editorId: undefined,
     selectedDirectoryName: undefined,
+    errorMessage: '', 
+    showErrorModal: false,
   }),
   methods: {
     // Credit: https://ourcodeworld.com/articles/read/1424/how-to-use-a-button-as-a-file-uploader-with-vuetify-in-vuejs
@@ -80,7 +88,14 @@ export default defineComponent({
     rememberFileSelectionUpload(event) {
       this.fileData = new FormData();
       this.fileData.append('file', event.target.files[0]);
-      this.uploadFile();
+      const fileExtension = event.target.files[0].name.split('.').pop();
+      console.log(fileExtension)
+      if (fileExtension === 'docx') {
+        this.uploadFile();
+      } else {
+        this.errorMessage = "Only .docx files can be uploaded.";
+        this.showErrorModal = true;
+      }
     },
     createSop(directoryName) {
       this.fileData = new FormData();
@@ -99,15 +114,13 @@ export default defineComponent({
       uploadNew(this.fileData)
         .then((res) => {
           console.log(res);
-        })
-        .catch((err) => {
-          console.log(err);
-          // TODO - handle errors properly
-        })
-        .finally(() => {
           this.isLoading = false;
           this.$emit('refresh');
-        });
+        })
+        .catch((err) => {
+          this.errorMessage = err;
+          this.showErrorModal = true;
+        })
     },
   },
 });

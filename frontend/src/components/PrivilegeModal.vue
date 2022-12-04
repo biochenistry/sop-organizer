@@ -28,6 +28,9 @@
           <v-btn @click="deleteUser">Remove</v-btn>
         </v-col>
       </v-row>
+      <v-row>
+        <v-col v-if="errorMessage" class="red--text mb-2">{{ errorMessage }}</v-col>
+      </v-row>
       <v-list>
         <v-list-item>
           <v-list-item-title>Name
@@ -73,6 +76,7 @@ export default defineComponent({
       usersList: [],
       cardKey: 0,
       email: "",
+      errorMessage: "",
     };
   },
   methods: {
@@ -93,6 +97,7 @@ export default defineComponent({
         })
     },
     grantAccess(user: User){
+      this.errorMessage = "";
       let newUserPrivileges = JSON.parse(JSON.stringify(user));
       newUserPrivileges.privilege = 1;
       updateUserPriv(user.id, newUserPrivileges)
@@ -101,10 +106,11 @@ export default defineComponent({
           this.refresh();
         })
         .catch((err) => {
-          console.log(err);
+          this.errorMessage = err;
         });
     },
     revokeAccess(user: User){
+      this.errorMessage = "";
       let newUserPrivileges = JSON.parse(JSON.stringify(user));
       newUserPrivileges.privilege = 0;
       updateUserPriv(user.id, newUserPrivileges)
@@ -113,23 +119,36 @@ export default defineComponent({
           this.refresh();
         })
         .catch((err) => {
-          console.log(err);
+          this.errorMessage = err;
         });
     },
     refresh(){
       this.cardKey += 1;
     },
     preregisterUser() {
+      this.errorMessage = "";
       preregisterUser({email: this.email})
         .then(() => {
           this.grabUsers();
         })
+        .catch((err) => {
+          this.errorMessage = err;
+        })
     },
     deleteUser() {
-      deleteUser({email: this.email})
-        .then(() => {
-          this.grabUsers();
-        })
+      this.errorMessage = "";
+      if(this.email === this.emailProp) {
+        this.errorMessage = "Error: Cannot delete yourself";
+      }
+      else {
+        deleteUser({email: this.email})
+          .then(() => {
+            this.grabUsers();
+          })
+          .catch((err) => {
+            this.errorMessage = err;
+          })
+      }
     }
   },
   mounted() {

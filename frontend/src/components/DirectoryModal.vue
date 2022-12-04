@@ -16,6 +16,11 @@
         >
       </v-responsive>
     </v-card>
+    <ErrorModal
+      v-if="showErrorModal"
+      :error-message="errorMessage"
+      @emitCloseErrorModal="showErrorModal = false"
+    />
   </v-overlay>
 </template>
 
@@ -32,6 +37,8 @@ export default defineComponent({
       errors: [],
       isModalVisible: false,
       isLoading: false,
+      errorMessage: '', 
+      showErrorModal: false,
     };
   },
   methods: {
@@ -56,14 +63,15 @@ export default defineComponent({
       const newDir: Directory = { name: `${this.name}` };
 
       createDirectories(newDir)
-        .catch((err) => {
-          console.log(err);
-          // TODO - handle errors properly
-        })
-        .finally(() => {
+        .then(() => {
           this.isLoading = false;
           this.closeModal();
           this.$emit('refresh');
+        })
+        .catch((err) => {
+          console.log(err);
+          this.errorMessage = err;
+          this.showErrorModal = true;
         });
     },
   },

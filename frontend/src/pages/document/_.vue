@@ -1,5 +1,11 @@
 <template>
-  <v-row justify="center" align="center">
+  <ErrorModal
+    v-if="showErrorModal"
+    :error-message="errorMessage"
+    @emitCloseErrorModal="showErrorModal = false"
+  />
+  <v-row v-else justify="center" align="center">
+    
     <v-col>
       <v-card>
         <v-card-title>
@@ -267,7 +273,7 @@ export default {
     try {
       document = await getDocument(documentId);
       sop = await getSOP(document.sop_id);
-      newName = sop.name;
+      newName = (sop.name).replace(/\.[^/.]+$/, '');
       file = await getFile(
         `${document.location}${document.version_number}.html`
       );
@@ -315,6 +321,8 @@ export default {
       versions: [],
       selectedVersion: {},
       newName: '',
+      errorMessage: '',
+      showErrorModal: false,
     };
   },
   head() {
@@ -343,6 +351,8 @@ export default {
           this.closeDeleteModal();
         })
         .catch((err) => {
+          this.errorMessage = err;
+          this.showErrorModal = true;
           this.error({
             statusCode: 500,
             message:
@@ -373,6 +383,8 @@ export default {
           this.closeAdminDeleteVersionModal();
         })
         .catch((err) => {
+          this.errorMessage = err;
+          this.showErrorModal = true;
           this.error({
             statusCode: 500,
             message: 'Something went wrong while deleting this version.',
@@ -392,6 +404,8 @@ export default {
           this.$root.$emit('refresh');
         })
         .catch((err) => {
+          this.errorMessage = err;
+          this.showErrorModal = true;
           this.error({
             statusCode: 500,
             message: 'Something went wrong while deleting the sop.',
@@ -413,6 +427,8 @@ export default {
           this.closeRenameModal();
         })
         .catch((err) => {
+          this.errorMessage = err;
+          this.showErrorModal = true;
           this.error({
             statusCode: 500,
             message: 'Something went wrong while renaming this SOP.',
@@ -439,9 +455,16 @@ export default {
     },
     rememberFileSelection(event) {
       this.selectedFile = event.target.files[0];
-      this.fileData = new FormData();
-      this.fileData.append('file', this.selectedFile);
-      this.updateExistingDocument();
+      const fileExtension = event.target.files[0].name.split('.').pop();
+      console.log(fileExtension)
+      if (fileExtension === 'docx') {
+        this.fileData = new FormData();
+        this.fileData.append('file', this.selectedFile);
+        this.updateExistingDocument();
+      } else {
+        this.errorMessage = "Only .docx files can be uploaded.";
+        this.showErrorModal = true;
+      }
     },
     updateExistingDocument() {
       this.fileData.append('sop_id', this.document.sop_id);
@@ -456,6 +479,8 @@ export default {
           this.$router.push(`/document/${res.id}`);
         })
         .catch((err) => {
+          this.errorMessage = err;
+          this.showErrorModal = true;
           console.log('Error updating');
           this.error({
             statusCode: 500,

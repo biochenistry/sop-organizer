@@ -13,6 +13,11 @@
     <v-card-text :class="{ hide: file == null || editingFile }">
       <div ref="quillViewer"></div>
     </v-card-text>
+    <ErrorModal
+      v-if="showErrorModal"
+      :error-message="errorMessage"
+      @emitCloseErrorModal="showErrorModal = false"
+    />
   </v-card>
 </template>
 
@@ -37,12 +42,15 @@ export default defineComponent({
       selectedFile: undefined,
       fileData: undefined,
       isSelecting: false,
+      showErrorModal: false,
+      errorMessage: '',
       toolbarOptions: [
         [{ font: [] }],
         [{ header: [1, 2, 3, 4, 5, 6, false] }],
         ['bold', 'italic', 'underline', 'strike'], // toggled buttons
         [{ align: [] }],
         [{ list: 'ordered' }, { list: 'bullet' }],
+        [{ 'script': 'sub'}, { 'script': 'super' }],
         ['blockquote', 'code-block'],
         [{ color: [] }, { background: [] }], // dropdown with defaults from theme
         ['clean'], // remove formatting button
@@ -110,13 +118,14 @@ export default defineComponent({
           this.$root.$emit('refresh');
         })
         .catch((err) => {
+          this.errorMessage = err;
+          this.showErrorModal = true;
           error({
             statusCode: 500,
             message: 'Something went wrong while saving the document',
             error: err,
           });
-        })
-        .finally(() => {});
+        });
     },
     emitDeletion() {
       this.$emit('delete-file');
