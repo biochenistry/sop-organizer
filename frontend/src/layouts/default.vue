@@ -162,7 +162,7 @@
           </v-btn>
         </v-list-item>
         <v-list-item v-show="isAdmin" class="mx-auto">
-          <v-btn align-center @click="showPrivModal = true">Edit Privileges</v-btn>
+          <v-btn align-center @click="showPrivModal = true">Edit Users</v-btn>
         </v-list-item>
         <v-list-item class="mx-auto">
           <v-btn>
@@ -213,6 +213,11 @@
       @emitCloseCreateSopModal="showCreateSopModal = false"
     />
     <SearchContentModal v-if="showSearchContentModal" @closeModal="showSearchContentModal = false" />
+    <ErrorModal
+      v-if="showErrorModal"
+      :error-message="errorMessage"
+      @emitCloseErrorModal="showErrorModal = false"
+    />
   </v-app>
 </template>
 
@@ -233,6 +238,7 @@ import { changeDirectory } from '~/services/sops';
 import { getSops, getDirectories } from '~/services/directories';
 import PrivilegeModal from '~/components/PrivilegeModal.vue';
 import { deleteDirectory } from '~/services/directories';
+import ErrorModal from '~/components/ErrorModal.vue';
 
 interface State {
   isSideBarVisible: boolean;
@@ -245,6 +251,7 @@ interface State {
   showSearchContentModal: boolean;
   showPrivModal: boolean;
   showCreateSopModal: boolean;
+  showErrorModal: boolean;
   title: String;
   sops: Array<SOP>;
   directories: Array<Directory>;
@@ -259,7 +266,8 @@ export default defineComponent({
     DirectoryModal,
     draggable,
     DirectoryChangeModal,
-    PrivilegeModal
+    PrivilegeModal,
+    ErrorModal
 },
   data() {
     return {
@@ -274,6 +282,8 @@ export default defineComponent({
       showSearchContentModal: false,
       showPrivModal: false,
       showCreateSopModal: false,
+      showErrorModal: false,
+      errorMessage: '',
       isLoading: true,
       directories: [],
       search: '',
@@ -355,7 +365,8 @@ export default defineComponent({
           });
         })
         .catch((err) => {
-          console.log(err);
+          this.errorMessage = err;
+          this.showErrorModal = true;
           this.isLoading = false;
         })
         .finally(() => {
@@ -472,17 +483,22 @@ export default defineComponent({
     },
     async deleteDir(id) {
       if(!this.isDirectoryEmpty(id)){
-        console.log("Not empty directory");
-        //TODO: Add error modal to tell user that directory is not empty
+        this.errorMessage = "Directory is not empty.";
+        this.showErrorModal = true;
         return -1;
       }
       else{
         console.log("Empty directory");
-        deleteDirectory(id).then((value) => {
-          if(value){
-            this.updateDocuments();
-          }
-        });
+        deleteDirectory(id)
+          .then((value) => {
+            if(value){
+              this.updateDocuments();
+            }
+          })
+          .catch((err) => {
+            this.errorMessage = err;
+            this.showErrorModal = true;
+          });
       }
     },
     isDirectoryEmpty(id){

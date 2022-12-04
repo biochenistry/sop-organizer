@@ -17,6 +17,11 @@
         >
       </v-responsive>
     </v-card>
+    <ErrorModal
+      v-if="showErrorModal"
+      :error-message="errorMessage"
+      @emitCloseErrorModal="showErrorModal = false"
+    />
   </v-overlay>
 </template>
 
@@ -36,13 +41,14 @@ export default defineComponent({
       isLoading: false,
       formData: this.initialFormData,
       hasPeriod: false,
+      showErrorModal: false,
+      errorMessage: '',
     };
   },
   methods: {
     closeModal() {
       this.$emit('emitCloseCreateSopModal');
     },
-
     confirmSopName() {
       if (!this.name) return;
       this.formData.append('file', new File([''], `${this.name}.html`));
@@ -53,24 +59,20 @@ export default defineComponent({
       if (nameSplit.length === 1) {
         this.hasPeriod = false;
         this.isLoading = true;
-        this.closeModal();
         uploadNew(this.formData)
           .then((res) => {
             console.log(res);
             this.$router.push(`/document/${res.id}`);
             this.$root.$emit('refresh');
-          })
-          .catch((err) => {
-            console.log(err);
-            // TODO - handle errors properly
-          })
-          .finally(() => {
             this.isLoading = false;
             this.closeModal();
+          })
+          .catch((err) => {
+            this.errorMessage = err;
+            this.showErrorModal = true;
           });
       } else {
-        this.hasPeriod = true;
-        
+        this.hasPeriod = true; 
       }
     },
   },

@@ -23,7 +23,7 @@
           v-model="cpassword"
           label="Confirm Password"
           type="password"
-          @keyup.enter.native="submit()"
+          @keyup.enter.native="register()"
         ></v-text-field>
         <v-card-subtitle v-if="errorMessage"
           ><strong>An error occurred.</strong> Error:<br />{{
