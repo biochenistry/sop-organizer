@@ -106,7 +106,7 @@
               <V-card-text>
                 <span class="text-body-1">
                   Are you sure that you want to mark file
-                  <strong>{{ document.original_file_name }}</strong> for
+                  <strong>{{ removeExtension(sop.name) }}</strong> for
                   deletion?
                 </span>
                 <br />
