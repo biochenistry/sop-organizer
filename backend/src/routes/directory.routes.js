@@ -96,7 +96,7 @@ const DirectoryRoutes = (app) => {
    *       200:
    *         description: Returns the directory deleted.
    */
-  router.delete('/:id', Directory.deleteById);  
+  router.delete('/:id/:name', Directory.deleteById);  
 
   app.use('/directory', router);
 };
