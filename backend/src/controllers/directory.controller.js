@@ -94,14 +94,15 @@ const getSopsIdsByDirectoryId = (req, res) => {
 };
 
 const deleteById = (req, res) => {
-  Directory.deleteById(req.params.id, (err, dir) => {
+  Directory.deleteById(req.params.id, req.params.name, (err, dir) => {
     if (err) {
       res.status(500).send({
         message: 'An error occurred while deleting the directory.',
       });
+      res.send(false);
       return;
     }
-    res.send(dir);
+    res.send(true);
   });
 };
 

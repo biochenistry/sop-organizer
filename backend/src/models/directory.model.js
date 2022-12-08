@@ -8,24 +8,28 @@ const Directory = function (directory) {
 };
 
 Directory.create = (newDir, resultCallback) => {
-  sql.query('INSERT INTO directories SET ?', newDir, (err) => {
-    if (err) {
-      console.log(`Error: ${err.message}`);
-      if (err.sqlMessage) {
-        console.log(`SQL Error: ${err.sqlMessage}`);
-      }
+  
+  const path = `${STORAGE_DIR}/${newDir.name}/`;
 
-      resultCallback(err, null);
-      return;
-    }
-
-    const path = `${STORAGE_DIR}/${newDir.name}/`;
-    if (!fs.existsSync(path)) {
+  if (!fs.existsSync(path)) {
+    try {
       fs.mkdirSync(path);
+      sql.query('INSERT INTO directories SET ?', newDir, (err) => {
+        if (err) {
+          console.log(`Error: ${err.message}`);
+          if (err.sqlMessage) {
+            console.log(`SQL Error: ${err.sqlMessage}`);
+          }
+    
+          resultCallback(err, null);
+          return;
+        }
+        resultCallback(undefined);
+      })
+    } catch (err) {
+      resultCallback(err, null);
     }
-
-    resultCallback(undefined);
-  });
+  }
 };
 
 Directory.getAll = (resultCallback) => {
@@ -109,19 +113,25 @@ Directory.getAllSOPLinks = (resultCallback) => {
   );
 };
 
-Directory.deleteById = (id, resultCallback)=> {
-  sql.query('DELETE FROM directories WHERE id = ? LIMIT 1', [id], (err, res) => {
-    if (err) {
-      console.log(`Error: ${err.message}`);
-      if (err.sqlMessage) {
-        console.log(`SQL Error: ${err.sqlMessage}`);
+Directory.deleteById = (id, name, resultCallback)=> {
+  const pathToDelete = `${STORAGE_DIR}/${name}/`;
+  try {
+    fs.rmSync(pathToDelete, { recursive: true, force: true });
+    sql.query('DELETE FROM directories WHERE id = ? LIMIT 1', [id], (err, res) => {
+      if (err) {
+        console.log(`Error: ${err.message}`);
+        if (err.sqlMessage) {
+          console.log(`SQL Error: ${err.sqlMessage}`);
+        }
+  
+        resultCallback(err, null);
+        return;
       }
-
-      resultCallback(err, null);
-      return;
-    }
-    resultCallback(undefined, res);
-  });
+      resultCallback(undefined, res);
+    });
+  } catch (err) {
+    resultCallback(err, null);
+  }
 };
 
 export default Directory;

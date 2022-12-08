@@ -25,7 +25,7 @@
                 <v-list-item @click="selectFile(directoryName)">
                   Upload
                 </v-list-item>
-                <v-list-item @click="deleteDirectory(dirID)">
+                <v-list-item @click="deleteDirectory(dirID, directoryName)">
                   Delete
                 </v-list-item>
                 <input
@@ -103,8 +103,8 @@ export default defineComponent({
       this.fileData.append('editor_id', window.localStorage.getItem('id'));
       this.$emit('emitOpenCreateSopModal', this.fileData);
     },
-    deleteDirectory(id){
-      this.$emit('emitDeleteDirectory', id);
+    deleteDirectory(id, name){
+      this.$emit('emitDeleteDirectory', id, name);
     },
     uploadFile() {
       this.fileData.append('directory_name', this.selectedDirectoryName);

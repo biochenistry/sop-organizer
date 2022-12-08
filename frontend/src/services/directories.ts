@@ -45,11 +45,11 @@ export async function getSops(id: number): Promise<Array<any>> {
 }
 
 
-export async function deleteDirectory(id): Promise<Boolean> {
-  const res = await fetch(`${BASE_URL}/directory/${id}`, {
+export async function deleteDirectory(id, name): Promise<Boolean> {
+  const res = await fetch(`${BASE_URL}/directory/${id}/${name}`, {
     method: 'DELETE',
     },
   );
-
-  return true;
+  const boolRes: Boolean = await (res.status === 200 || res.status === 201);
+  return boolRes;
 };

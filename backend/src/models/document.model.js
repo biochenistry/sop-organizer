@@ -398,28 +398,31 @@ Document.afterDownload = (document, resultCallback) => {
       if (err) {
         console.log(`Error: ${err.message}`);
       }
-      let sopName = JSON.parse(JSON.stringify(res))[0].name;
-      console.log(sopName);
-      sopName = sopName.replace(/\.[^/.]+$/, ""); // remove file extensions if any
+      try {
+        let sopName = JSON.parse(JSON.stringify(res))[0].name;
 
-      // for some reason, we don't need quotes even if sopName has spaces
-      const pathToDelete = `${STORAGE_DIR}/${document.location}/${sopName}.docx`;
+        sopName = sopName.replace(/\.[^/.]+$/, ""); // remove file extensions if any
 
-      console.log(
-        `Deleting ${pathToDelete}`
-      );
-      // resultCallback(null, "success");
-    
-      fs.unlink(pathToDelete, (err => {
-        if(err) {
-          console.log('Error deleting file: ' + err);
-        }
-        resultCallback(null, "success");
-      }))
+        // for some reason, we don't need quotes even if sopName has spaces
+        const pathToDelete = `${STORAGE_DIR}/${document.location}/${sopName}.docx`;
+
+        console.log(
+          `Deleting ${pathToDelete}`
+        );
+        // resultCallback(null, "success");
+      
+        fs.unlink(pathToDelete, (err => {
+          if(err) {
+            console.log('Error deleting file: ' + err);
+          }
+          resultCallback(null, "success");
+        }))
+      } catch (err) {
+        console.log("error deleting file");
+        resultCallback(null, "error");
+      }   
     }
   )
-  
-  
 };
 
 export default Document;

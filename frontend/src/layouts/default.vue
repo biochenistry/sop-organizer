@@ -51,16 +51,16 @@
                 >
                   Unsorted
                 </v-list-item>
-                <v-list-item @click="sortByDate(-1)">
+                <v-list-item @click="sortDirection = -1; sortByDate(sortDirection)">
                   Date <v-icon>mdi-arrow-up</v-icon>
                 </v-list-item>
-                <v-list-item @click="sortByDate(1)">
+                <v-list-item @click="sortDirection = 1; sortByDate(sortDirection)">
                   Date <v-icon>mdi-arrow-down</v-icon>
                 </v-list-item>
-                <v-list-item @click="sortByAlphabetical(-1)">
+                <v-list-item @click="sortDirection = -1; sortByAlphabetical(sortDirection)">
                   Alphabetical <v-icon>mdi-arrow-up</v-icon>
                 </v-list-item>
-                <v-list-item @click="sortByAlphabetical(1)">
+                <v-list-item @click="sortDirection = 1; sortByAlphabetical(sortDirection)">
                   Alphabetical <v-icon>mdi-arrow-down</v-icon>
                 </v-list-item>
               </v-list>
@@ -294,6 +294,7 @@ export default defineComponent({
       isSorted: false,
       isSortedByDate: false,
       isSortedByAlphabetical: false,
+      sortDirection: 1
     };
   },
   computed: {
@@ -326,52 +327,65 @@ export default defineComponent({
   },
   methods: {
     updateDocuments() {
-      // TODO - loading stuff
       this.sops = [];
       this.isLoading = true;
-      getDirectories()
-        .then((directories) => {
-          directories.forEach((directory, directoryIndex) => {
-            directory.sops = [];
-            this.expandedGroup.push(directoryIndex);
-            getSops(directory.id)
-              .then((sops) => {
-                sops.forEach((sop, sopIndex) => {
-                  getSOP(sop.sop_id).then((sop) => {
-                    directory.sops.push(sop);
-                    this.sops.push(sop);
-                    this.directories = directories;
-                    if (
-                      directoryIndex === directories.length - 1 &&
-                      sopIndex === sops.length - 1
-                    ) {
-                      if (this.isSortedByDate) {
-                        this.sortByDate();
-                      } else if (this.isSortedByAlphabetical) {
-                        this.sortByAlphabetical();
-                      }
+      try {
+        getDirectories()
+          .then((directories) => {
+            if (directories.length === 0) {
+              this.directories = [];
+              this.isLoading = false;
+            }
+            directories.forEach((directory, directoryIndex) => {
+              directory.sops = [];
+              this.expandedGroup.push(directoryIndex);
+              getSops(directory.id)
+                .then((sops) => {
+                  sops.forEach((sop, sopIndex) => {
+                    try {
+                      getSOP(sop.sop_id).then((sop) => {
+                        directory.sops.push(sop);
+                        this.sops.push(sop);
+                        this.directories = directories;
+                        if (
+                          directoryIndex === directories.length - 1 &&
+                          sopIndex === sops.length - 1
+                        ) {
+                          if (this.isSortedByDate) {
+                            this.sortByDate(this.sortDirection);
+                          } else if (this.isSortedByAlphabetical) {
+                            this.sortByAlphabetical(this.sortDirection);
+                          }
+                        }
+                      });
+                    } catch (err) {
+                      // no sops found
+                      console.log("!")
+                      this.isLoading = false;
                     }
                   });
+                })
+                .catch((err) => {
+                  this.isLoading = false;
+                  this.directories = directories;
+                })
+                .finally(() => {
+                  this.isLoading = false;
                 });
-              })
-              .catch((err) => {
-                // No directories
-                this.isLoading = false;
-                this.directories = directories;
-              })
-              .finally(() => {
-                this.isLoading = false;
-              });
+            });
+          })
+          .catch((err) => {
+            this.errorMessage = err;
+            this.showErrorModal = true;
+            this.isLoading = false;
+          })
+          .finally(() => {
+            this.isLoading = false;
           });
-        })
-        .catch((err) => {
-          this.errorMessage = err;
-          this.showErrorModal = true;
-          this.isLoading = false;
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      } catch(err) {
+        this.directories = [];
+        this.isLoading = false;
+      }
     },
     checkAuthentication() {
       if (window.localStorage.getItem('accessToken')) {
@@ -481,16 +495,16 @@ export default defineComponent({
         this.sops.sort((a, b) => a.name.localeCompare(b.name));
       else this.sops.sort((a, b) => b.name.localeCompare(a.name));
     },
-    async deleteDir(id) {
+    async deleteDir(id, name) {
       if(!this.isDirectoryEmpty(id)){
         this.errorMessage = "Directory is not empty.";
         this.showErrorModal = true;
         return -1;
       }
       else{
-        console.log("Empty directory");
-        deleteDirectory(id)
+        deleteDirectory(id, name)
           .then((value) => {
+            console.log(value);
             if(value){
               this.updateDocuments();
             }

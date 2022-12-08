@@ -47,7 +47,7 @@ export default defineComponent({
     },
 
     validatateDirectory() {
-      const regex = /^[\w\-\s]+$/;
+      const regex = /^[\w-]+$/;
       return regex.test(this.name);
     },
 
