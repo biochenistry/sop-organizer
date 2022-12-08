@@ -9,6 +9,7 @@ import SOPRoutes from './routes/sop.routes.js';
 import UserRoutes from './routes/user.routes.js';
 import DirectoryRoutes from './routes/directory.routes.js';
 import AuthRoutes from './routes/auth.routes.js';
+import ApiRoutes from './routes/api.routes.js';
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -27,6 +28,7 @@ DocumentRoutes(app);
 DirectoryRoutes(app);
 AuthRoutes(app);
 UserRoutes(app);
+ApiRoutes(app);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
