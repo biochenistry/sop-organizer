@@ -30,7 +30,7 @@
         <v-card v-if="documents.length && !isLoading" class="d-flex flex-column pa-4 mt-4" style="max-height: 40vh; overflow: scroll;">
           <v-list>
             <v-list-item v-for="doc in documents" :key="doc.id" :to="`/document/${doc.id}`" @click="emitCloseModal()">
-              {{ doc.original_file_name }} - Version {{ doc.version_number }}
+              {{ removeExtension(doc.original_file_name) }} - Version {{ doc.version_number }}
             </v-list-item>
           </v-list>
         </v-card>
@@ -92,6 +92,9 @@ export default defineComponent({
           this.isLoading = false;
           this.lastSearch = this.search;
         });
+    },
+    removeExtension(str){
+      return str.replace(/\.[^/.]+$/, "");
     },
   },
 });
